@@ -1,0 +1,84 @@
+/* GAME */
+
+.game {
+	width: 100vw;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 0 8rem;
+}
+
+.top {
+	height: 10vh;
+	display: flex;
+	width: 100%;
+	align-items: flex-end;
+}
+
+.details {
+	height: 80vh;
+	width: 100%;
+	display: flex;
+	gap: 4rem;
+	justify-content: flex-start;
+}
+
+.history {
+	width: calc(var(--square-size) * 8);
+	border: solid 1px solid var(--board-light);
+	background-color: blue;
+}
+
+.bottom {
+	display: flex;
+	height: 10vh;
+	width: 100%;
+	position: relative; /* Para aventar el botón a la derecha */
+}
+
+.buttons-game {
+	position: absolute;
+	right: 0;
+	display: flex;
+}
+
+/* BOARD */
+:root {
+	--board-dark: #779557;
+	--board-light: #ebecd0;
+	--square-size: calc(80vh / 8);
+}
+
+.board {
+	display: grid;
+	grid-template-columns: repeat(8, var(--square-size));
+	grid-template-rows: repeat(8, var(--square-size));
+}
+
+.square {
+	position: relative;
+}
+
+.square-light {
+	background-color: var(--board-light);
+	color: var(--board-dark);
+}
+
+.square-dark {
+	background-color: var(--board-dark);
+	color: var(--board-light);
+}
+
+.letter-span {
+	position: absolute;
+	bottom: 5%;
+	right: 10%;
+}
+
+.num-span {
+	position: absolute;
+	top: 5%;
+	left: 5%;
+}
