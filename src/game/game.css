@@ -27,58 +27,29 @@
 
 .history {
 	width: calc(var(--square-size) * 8);
-	border: solid 1px solid var(--board-light);
-	background-color: blue;
+	border: solid 1px var(--board-light);
 }
 
 .bottom {
 	display: flex;
 	height: 10vh;
 	width: 100%;
-	position: relative; /* Para aventar el botón a la derecha */
+	gap: 4rem;
+}
+
+.player-info {
+	display: flex;
+	gap: 1rem;
+	width: calc(var(--square-size) * 8);
 }
 
 .buttons-game {
-	position: absolute;
-	right: 0;
 	display: flex;
+	justify-content: flex-end;
+	width: calc(var(--square-size) * 8);
 }
 
-/* BOARD */
-:root {
-	--board-dark: #779557;
-	--board-light: #ebecd0;
-	--square-size: calc(80vh / 8);
-}
-
-.board {
-	display: grid;
-	grid-template-columns: repeat(8, var(--square-size));
-	grid-template-rows: repeat(8, var(--square-size));
-}
-
-.square {
-	position: relative;
-}
-
-.square-light {
-	background-color: var(--board-light);
-	color: var(--board-dark);
-}
-
-.square-dark {
-	background-color: var(--board-dark);
-	color: var(--board-light);
-}
-
-.letter-span {
-	position: absolute;
-	bottom: 5%;
-	right: 10%;
-}
-
-.num-span {
-	position: absolute;
-	top: 5%;
-	left: 5%;
+.buttons-game button {
+	width: 100px;
+	height: 40px;
 }

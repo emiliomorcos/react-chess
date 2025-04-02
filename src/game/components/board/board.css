@@ -1,0 +1,49 @@
+:root {
+	--board-dark: #779557;
+	--board-light: #ebecd0;
+	--square-size: calc(80vh / 8);
+}
+
+.board {
+	display: grid;
+	grid-template-columns: repeat(8, var(--square-size));
+	grid-template-rows: repeat(8, var(--square-size));
+}
+
+.square {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.square img {
+	width: calc(var(--square-size) * 0.95);
+	height: calc(var(--square-size) * 0.95);
+}
+
+.square.has-piece:hover {
+	cursor: grab;
+}
+
+.square-light {
+	background-color: var(--board-light);
+	color: var(--board-dark);
+}
+
+.square-dark {
+	background-color: var(--board-dark);
+	color: var(--board-light);
+}
+
+.letter-span {
+	position: absolute;
+	bottom: 5%;
+	right: 4%;
+}
+
+.num-span {
+	position: absolute;
+	top: 5%;
+	left: 5%;
+}
