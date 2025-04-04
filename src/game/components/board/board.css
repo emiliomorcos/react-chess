@@ -26,6 +26,10 @@
 	cursor: grab;
 }
 
+.square.possible-movement {
+	background-color: blue;
+}
+
 .square-light {
 	background-color: var(--board-light);
 	color: var(--board-dark);
