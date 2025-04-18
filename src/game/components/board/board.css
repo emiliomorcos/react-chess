@@ -26,8 +26,15 @@
 	cursor: grab;
 }
 
-.square.possible-movement {
-	background-color: blue;
+.movement-icon {
+	width: calc(var(--square-size) * 0.3);
+	height: calc(var(--square-size) * 0.3);
+	border-radius: 50%;
+	background-color: rgba(0, 0, 0, 0.2);
+}
+
+.square.selected-piece {
+	background-color: hsl(65, 84%, 70%);
 }
 
 .square-light {

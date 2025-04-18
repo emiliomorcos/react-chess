@@ -1,6 +1,14 @@
 import "./board.css";
 import { useState } from "react";
 import { defineInitialPositions } from "../../../constants";
+import {
+	getPawnMovements,
+	getKnightMovements,
+	getKingMovements,
+	getRookMovements,
+	getBishopMovements,
+	getQueenMovements,
+} from "./movements";
 
 // Generamos tablero
 const Board = ({ numbers }) => {
@@ -13,6 +21,7 @@ const Board = ({ numbers }) => {
 
 	const [pieces, setPieces] = useState(defineInitialPositions(numbers));
 	const [possiblePieceMovements, setPossiblePieceMovements] = useState([]);
+	const [selectedPiece, setSelectedPiece] = useState(null);
 
 	// Definimos colores de cuadros con base en matriz y determinamos si hay una pieza en un square
 	const getSquareClassname = (x, y, hasPiece) => {
@@ -24,44 +33,73 @@ const Board = ({ numbers }) => {
 		});
 
 		classname += isPossibleMovement ? " possible-movement" : "";
+		classname +=
+			selectedPiece &&
+			selectedPiece.position.x === x &&
+			selectedPiece.position.y === y
+				? " selected-piece"
+				: "";
 		return classname;
 	};
 	// Definimos función para manejar el click de una pieza
-	const handlePieceClick = (x, y, hasPiece) => {
+	const handlePieceClick = (x, y, hasPiece, isPossibleMovement) => {
 		if (!hasPiece) {
-			console.log("no piece here");
+			if (isPossibleMovement) {
+				const tempPieces = [...pieces];
+				const tempPiece = tempPieces.find((p) => {
+					return (
+						p.position.x === selectedPiece.position.x &&
+						p.position.y === selectedPiece.position.y
+					);
+				});
+
+				const pieceIndex = tempPieces.indexOf(tempPiece);
+				tempPieces[pieceIndex].position.x = x;
+				tempPieces[pieceIndex].position.y = y;
+				tempPieces[pieceIndex].hasMoved = true;
+				setPieces(tempPieces);
+				setSelectedPiece(null);
+				setPossiblePieceMovements([]);
+			}
 			return;
 		}
 
-		console.log("Posición: ", x, y);
 		const piece = pieces.find((p) => {
 			return p.position.x === x && p.position.y === y;
 		});
+
+		setSelectedPiece(piece);
 
 		var possibleMovements = [];
 
 		switch (piece.type) {
 			case "pawn":
-				possibleMovements = darkOnTop
-					? piece.color === "dark"
-						? [{ x, y: y + 1 }]
-						: [{ x, y: y - 1 }]
-					: piece.color === "dark"
-					? [{ x, y: y - 1 }]
-					: [{ x, y: y + 1 }];
+				possibleMovements = getPawnMovements(
+					piece,
+					x,
+					y,
+					darkOnTop,
+					pieces
+				);
+				break;
 
-				if (!piece.hasMoved) {
-					possibleMovements.push(
-						darkOnTop
-							? piece.color === "dark"
-								? { x, y: y + 2 }
-								: { x, y: y - 2 }
-							: piece.color === "dark"
-							? { x, y: y - 2 }
-							: { x, y: y + 2 }
-					);
-				}
-				console.log(piece, "Posibles movimientos: ", possibleMovements);
+			case "knight":
+				possibleMovements = getKnightMovements(piece, x, y, pieces);
+				break;
+
+			case "king":
+				possibleMovements = getKingMovements(piece, x, y, pieces);
+				break;
+
+			case "rook":
+				possibleMovements = getRookMovements(piece, x, y, pieces);
+				break;
+
+			case "bishop":
+				possibleMovements = getBishopMovements(piece, x, y, pieces);
+				break;
+			case "queen":
+				possibleMovements = getQueenMovements(piece, x, y, pieces);
 				break;
 		}
 
@@ -76,11 +114,23 @@ const Board = ({ numbers }) => {
 					const hasPiece = pieces.some((piece) => {
 						return piece.position.x === x && piece.position.y === y;
 					});
+					const isPossibleMovement = possiblePieceMovements.some(
+						(movement) => {
+							return movement.x === x && movement.y === y;
+						}
+					);
 					return (
 						<div
 							key={`p${x}${y}`}
 							className={getSquareClassname(x, y, hasPiece)}
-							onClick={() => handlePieceClick(x, y, hasPiece)}
+							onClick={() =>
+								handlePieceClick(
+									x,
+									y,
+									hasPiece,
+									isPossibleMovement
+								)
+							}
 						>
 							{x === 0 && (
 								<span className="num-span">{number}</span>
@@ -99,6 +149,9 @@ const Board = ({ numbers }) => {
 									)
 								);
 							})}
+							{isPossibleMovement && (
+								<div className="movement-icon"></div>
+							)}
 						</div>
 					);
 				});
