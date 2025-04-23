@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./menu.css";
 
+//TODO: Agregar jugar al dar click a Enter
 const Menu = () => {
 	const [gameType, setGameType] = useState("two-players");
 	const [difficulty, setDifficulty] = useState("facil");

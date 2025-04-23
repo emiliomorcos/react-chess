@@ -23,6 +23,7 @@ const isInsideBoard = (x, y) => {
 };
 
 // ----------- PAWNS -----------
+// TODO: EN PASSANT
 const getPawnMovements = (piece, x, y, darkOnTop, pieces) => {
 	var possibleMovements = [];
 
@@ -34,7 +35,13 @@ const getPawnMovements = (piece, x, y, darkOnTop, pieces) => {
 		? [{ x, y: y - 1 }]
 		: [{ x, y: y + 1 }];
 
+	// Usamos getPossibleTakes para ver si hay una pieza enemiga enfrente y quitar el movimiento
+	if (getPossibleTakes(pieces, possibleMovements[0], piece)) {
+		possibleMovements.pop();
+	}
+
 	if (
+		possibleMovements.length &&
 		!piece.hasMoved &&
 		!getFriendlyCollisions(pieces, possibleMovements[0], piece)
 	) {
@@ -74,6 +81,12 @@ const getPawnMovements = (piece, x, y, darkOnTop, pieces) => {
 			isInsideBoard(movement.x, movement.y) &&
 			getFriendlyCollisions(pieces, movement, piece) === false
 		);
+	});
+
+	possibleTakes.forEach((take) => {
+		if (getPossibleTakes(pieces, take, piece)) {
+			filteredMovements.push({ ...take, isTake: true });
+		}
 	});
 
 	return filteredMovements;

@@ -22,6 +22,8 @@ const Board = ({ numbers }) => {
 	const [pieces, setPieces] = useState(defineInitialPositions(numbers));
 	const [possiblePieceMovements, setPossiblePieceMovements] = useState([]);
 	const [selectedPiece, setSelectedPiece] = useState(null);
+	const [capturesTop, setCapturesTop] = useState([]);
+	const [capturesBottom, setCapturesBottom] = useState([]);
 
 	// Definimos colores de cuadros con base en matriz y determinamos si hay una pieza en un square
 	const getSquareClassname = (x, y, hasPiece) => {
@@ -42,7 +44,13 @@ const Board = ({ numbers }) => {
 		return classname;
 	};
 	// Definimos función para manejar el click de una pieza
-	const handlePieceClick = (x, y, hasPiece, isPossibleMovement) => {
+	const handlePieceClick = (
+		x,
+		y,
+		hasPiece,
+		isPossibleMovement,
+		isPossibleTake
+	) => {
 		if (!hasPiece) {
 			if (isPossibleMovement) {
 				const tempPieces = [...pieces];
@@ -67,6 +75,30 @@ const Board = ({ numbers }) => {
 		const piece = pieces.find((p) => {
 			return p.position.x === x && p.position.y === y;
 		});
+
+		// Checar si el square con pieza es un possible movement && isTake === true
+		if (isPossibleTake) {
+			// Agregamos como captura la pieza clickeada
+			if (darkOnTop) {
+				piece.color === "dark"
+					? setCapturesBottom([...capturesTop, piece])
+					: setCapturesTop([...capturesBottom, piece]);
+			} else {
+				piece.color === "dark"
+					? setCapturesTop([...capturesBottom, piece])
+					: setCapturesBottom([...capturesTop, piece]);
+			}
+
+			const tempPieces = [...pieces];
+			const tempPieceIndex = tempPieces.indexOf(piece);
+			tempPieces.splice(tempPieceIndex, 1);
+
+			setPieces(tempPieces);
+			setSelectedPiece(null);
+			setPossiblePieceMovements([]);
+
+			return;
+		}
 
 		setSelectedPiece(piece);
 
@@ -119,6 +151,15 @@ const Board = ({ numbers }) => {
 							return movement.x === x && movement.y === y;
 						}
 					);
+					const isPossibleTake = possiblePieceMovements.some(
+						(movement) => {
+							return (
+								movement.x === x &&
+								movement.y === y &&
+								movement.isTake
+							);
+						}
+					);
 					return (
 						<div
 							key={`p${x}${y}`}
@@ -128,7 +169,8 @@ const Board = ({ numbers }) => {
 									x,
 									y,
 									hasPiece,
-									isPossibleMovement
+									isPossibleMovement,
+									isPossibleTake
 								)
 							}
 						>
