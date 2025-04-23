@@ -8,6 +8,16 @@ const getFriendlyCollisions = (pieces, movement, piece) => {
 	});
 };
 
+const getPossibleTakes = (pieces, movement, piece) => {
+	return pieces.some((p) => {
+		return (
+			p.position.x === movement.x &&
+			p.position.y === movement.y &&
+			p.color !== piece.color
+		);
+	});
+};
+
 const isInsideBoard = (x, y) => {
 	return x >= 0 && x <= 7 && y >= 0 && y <= 7;
 };
@@ -39,6 +49,26 @@ const getPawnMovements = (piece, x, y, darkOnTop, pieces) => {
 		);
 	}
 
+	const possibleTakes = darkOnTop
+		? piece.color === "dark"
+			? [
+					{ x: x + 1, y: y + 1 },
+					{ x: x - 1, y: y + 1 },
+			  ]
+			: [
+					{ x: x + 1, y: y - 1 },
+					{ x: x - 1, y: y - 1 },
+			  ]
+		: piece.color === "dark"
+		? [
+				{ x: x + 1, y: y - 1 },
+				{ x: x - 1, y: y - 1 },
+		  ]
+		: [
+				{ x: x + 1, y: y + 1 },
+				{ x: x - 1, y: y + 1 },
+		  ];
+
 	const filteredMovements = possibleMovements.filter((movement) => {
 		return (
 			isInsideBoard(movement.x, movement.y) &&
@@ -62,11 +92,17 @@ const getKnightMovements = (piece, x, y, pieces) => {
 		{ x: x + 1, y: y + 2 },
 	];
 
-	const filteredMovements = possibleMovements.filter((movement) => {
+	var filteredMovements = possibleMovements.filter((movement) => {
 		return (
 			isInsideBoard(movement.x, movement.y) &&
 			getFriendlyCollisions(pieces, movement, piece) === false
 		);
+	});
+
+	filteredMovements = filteredMovements.map((movement) => {
+		return getPossibleTakes(pieces, movement, piece)
+			? { ...movement, isTake: true }
+			: movement;
 	});
 
 	return filteredMovements;
@@ -85,16 +121,25 @@ const getKingMovements = (piece, x, y, pieces) => {
 		{ x: x + 1, y: y + 1 },
 	];
 
-	const filteredMovements = possibleMovements.filter((movement) => {
+	var filteredMovements = possibleMovements.filter((movement) => {
 		return (
 			isInsideBoard(movement.x, movement.y) &&
 			getFriendlyCollisions(pieces, movement, piece) === false
 		);
 	});
 
+	filteredMovements = filteredMovements.map((movement) => {
+		return getPossibleTakes(pieces, movement, piece)
+			? { ...movement, isTake: true }
+			: movement;
+	});
+
+	console.log("filteredMovements", filteredMovements);
+
 	return filteredMovements;
 };
 
+// ----------- ROOKS -----------
 const getRookMovements = (piece, x, y, pieces) => {
 	var possibleMovements = [];
 
@@ -110,12 +155,22 @@ const getRookMovements = (piece, x, y, pieces) => {
 			let newX = x + dx * i;
 			let newY = y + dy * i;
 
-			if (
-				isInsideBoard(newX, newY) &&
-				getFriendlyCollisions(pieces, { x: newX, y: newY }, piece) ===
-					false
-			) {
-				possibleMovements.push({ x: newX, y: newY });
+			if (isInsideBoard(newX, newY)) {
+				if (getPossibleTakes(pieces, { x: newX, y: newY }, piece)) {
+					possibleMovements.push({ x: newX, y: newY, isTake: true });
+					break;
+				}
+				if (
+					getFriendlyCollisions(
+						pieces,
+						{ x: newX, y: newY },
+						piece
+					) === false
+				) {
+					possibleMovements.push({ x: newX, y: newY });
+				} else {
+					break;
+				}
 			} else {
 				break;
 			}
@@ -125,6 +180,7 @@ const getRookMovements = (piece, x, y, pieces) => {
 	return possibleMovements;
 };
 
+// ----------- BISHOPS -----------
 const getBishopMovements = (piece, x, y, pieces) => {
 	var possibleMovements = [];
 
@@ -140,12 +196,22 @@ const getBishopMovements = (piece, x, y, pieces) => {
 			let newX = x + dx * i;
 			let newY = y + dy * i;
 
-			if (
-				isInsideBoard(newX, newY) &&
-				getFriendlyCollisions(pieces, { x: newX, y: newY }, piece) ===
-					false
-			) {
-				possibleMovements.push({ x: newX, y: newY });
+			if (isInsideBoard(newX, newY)) {
+				if (getPossibleTakes(pieces, { x: newX, y: newY }, piece)) {
+					possibleMovements.push({ x: newX, y: newY, isTake: true });
+					break;
+				}
+				if (
+					getFriendlyCollisions(
+						pieces,
+						{ x: newX, y: newY },
+						piece
+					) === false
+				) {
+					possibleMovements.push({ x: newX, y: newY });
+				} else {
+					break;
+				}
 			} else {
 				break;
 			}
@@ -155,6 +221,7 @@ const getBishopMovements = (piece, x, y, pieces) => {
 	return possibleMovements;
 };
 
+// ----------- QUEEN -----------
 const getQueenMovements = (piece, x, y, pieces) => {
 	var possibleMovements = [
 		...getRookMovements(piece, x, y, pieces),
