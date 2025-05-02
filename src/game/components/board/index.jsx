@@ -8,10 +8,17 @@ import {
 	getRookMovements,
 	getBishopMovements,
 	getQueenMovements,
+	movePieceOnTake,
 } from "./movements";
 
 // Generamos tablero
-const Board = ({ numbers }) => {
+const Board = ({
+	numbers,
+	capturesTop,
+	setCapturesTop,
+	capturesBottom,
+	setCapturesBottom,
+}) => {
 	const darkOnTop = numbers[0] === "8";
 
 	// Definimos letras de columnas
@@ -22,8 +29,6 @@ const Board = ({ numbers }) => {
 	const [pieces, setPieces] = useState(defineInitialPositions(numbers));
 	const [possiblePieceMovements, setPossiblePieceMovements] = useState([]);
 	const [selectedPiece, setSelectedPiece] = useState(null);
-	const [capturesTop, setCapturesTop] = useState([]);
-	const [capturesBottom, setCapturesBottom] = useState([]);
 
 	// Definimos colores de cuadros con base en matriz y determinamos si hay una pieza en un square
 	const getSquareClassname = (x, y, hasPiece) => {
@@ -53,18 +58,13 @@ const Board = ({ numbers }) => {
 	) => {
 		if (!hasPiece) {
 			if (isPossibleMovement) {
-				const tempPieces = [...pieces];
-				const tempPiece = tempPieces.find((p) => {
-					return (
-						p.position.x === selectedPiece.position.x &&
-						p.position.y === selectedPiece.position.y
-					);
-				});
+				const tempPieces = movePieceOnTake(
+					[...pieces],
+					selectedPiece,
+					x,
+					y
+				);
 
-				const pieceIndex = tempPieces.indexOf(tempPiece);
-				tempPieces[pieceIndex].position.x = x;
-				tempPieces[pieceIndex].position.y = y;
-				tempPieces[pieceIndex].hasMoved = true;
 				setPieces(tempPieces);
 				setSelectedPiece(null);
 				setPossiblePieceMovements([]);
@@ -81,17 +81,18 @@ const Board = ({ numbers }) => {
 			// Agregamos como captura la pieza clickeada
 			if (darkOnTop) {
 				piece.color === "dark"
-					? setCapturesBottom([...capturesTop, piece])
-					: setCapturesTop([...capturesBottom, piece]);
+					? setCapturesBottom([...capturesBottom, piece])
+					: setCapturesTop([...capturesTop, piece]);
 			} else {
 				piece.color === "dark"
-					? setCapturesTop([...capturesBottom, piece])
-					: setCapturesBottom([...capturesTop, piece]);
+					? setCapturesTop([...capturesTop, piece])
+					: setCapturesBottom([...capturesBottom, piece]);
 			}
 
-			const tempPieces = [...pieces];
+			var tempPieces = [...pieces];
 			const tempPieceIndex = tempPieces.indexOf(piece);
 			tempPieces.splice(tempPieceIndex, 1);
+			tempPieces = movePieceOnTake(tempPieces, selectedPiece, x, y);
 
 			setPieces(tempPieces);
 			setSelectedPiece(null);

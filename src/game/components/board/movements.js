@@ -1,3 +1,19 @@
+const movePieceOnTake = (tempPieces, selectedPiece, x, y) => {
+	const tempPiece = tempPieces.find((p) => {
+		return (
+			p.position.x === selectedPiece.position.x &&
+			p.position.y === selectedPiece.position.y
+		);
+	});
+
+	const pieceIndex = tempPieces.indexOf(tempPiece);
+	tempPieces[pieceIndex].position.x = x;
+	tempPieces[pieceIndex].position.y = y;
+	tempPieces[pieceIndex].hasMoved = true;
+
+	return tempPieces;
+};
+
 const getFriendlyCollisions = (pieces, movement, piece) => {
 	return pieces.some((p) => {
 		return (
@@ -54,6 +70,16 @@ const getPawnMovements = (piece, x, y, darkOnTop, pieces) => {
 				? { x, y: y - 2 }
 				: { x, y: y + 2 }
 		);
+
+		if (
+			getPossibleTakes(
+				pieces,
+				possibleMovements[possibleMovements.length - 1],
+				piece
+			)
+		) {
+			possibleMovements.pop();
+		}
 	}
 
 	const possibleTakes = darkOnTop
@@ -251,4 +277,5 @@ export {
 	getRookMovements,
 	getBishopMovements,
 	getQueenMovements,
+	movePieceOnTake,
 };
