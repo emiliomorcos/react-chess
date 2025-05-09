@@ -138,7 +138,7 @@ const Board = ({
 
 		setPossiblePieceMovements(possibleMovements);
 	};
-
+	// AQUI
 	return (
 		<div className="board">
 			{numbers.map((number, y) => {

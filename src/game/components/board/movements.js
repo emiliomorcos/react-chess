@@ -1,3 +1,54 @@
+// Función para obtener los movimientos posibles de una pieza Y saber los movimientos válidos de un rey
+const getPieceMovements = (piece, x, y, pieces) => {
+	var possibleMovements = [];
+
+	switch (piece.type) {
+		case "knight":
+			possibleMovements = getKnightMovements(piece, x, y, pieces);
+			break;
+
+		case "king":
+			possibleMovements = getKingRawMovements(piece, x, y, pieces);
+			break;
+
+		case "rook":
+			possibleMovements = getRookMovements(piece, x, y, pieces);
+			break;
+
+		case "bishop":
+			possibleMovements = getBishopMovements(piece, x, y, pieces);
+			break;
+		case "queen":
+			possibleMovements = getQueenMovements(piece, x, y, pieces);
+			break;
+	}
+
+	return possibleMovements;
+};
+
+// Función para sacar los movimientos posibles del rey opuesto y evitar ciclos
+const getKingRawMovements = (piece, x, y, pieces) => {
+	var possibleMovements = [
+		{ x: x - 1, y: y - 1 },
+		{ x: x - 1, y: y },
+		{ x: x - 1, y: y + 1 },
+		{ x: x, y: y - 1 },
+		{ x: x, y: y + 1 },
+		{ x: x + 1, y: y - 1 },
+		{ x: x + 1, y: y },
+		{ x: x + 1, y: y + 1 },
+	];
+
+	var filteredMovements = possibleMovements.filter((movement) => {
+		return (
+			isInsideBoard(movement.x, movement.y) &&
+			getFriendlyCollisions(pieces, movement, piece) === false
+		);
+	});
+
+	return filteredMovements;
+};
+
 const movePieceOnTake = (tempPieces, selectedPiece, x, y) => {
 	const tempPiece = tempPieces.find((p) => {
 		return (
@@ -24,18 +75,27 @@ const getFriendlyCollisions = (pieces, movement, piece) => {
 	});
 };
 
-
-
 const isValidKingMovement = (pieces, movement, piece) => {
-	const { color: kingColor, x: kingX, y: kingY } = piece;
+	const { color: kingColor } = piece;
+	const { x, y } = movement;
 	const enemyPieces = pieces.filter((p) => p.color !== kingColor);
 
-	const enemyPossibleMovements = [];
+	enemyPieces.forEach((enemyPiece) => {
+		if (enemyPiece.type === "pawn") {
+		} else {
+			const enemyPieceMovements = getPieceMovements(
+				enemyPiece,
+				enemyPiece.position.x,
+				enemyPiece.position.y,
+				pieces
+			);
 
-	enemyPieces.forEach((enemyPiece))
-
-
-}
+			return !enemyPieceMovements.some((enemyPM) => {
+				return enemyPM.x === x && enemyPM.y === y;
+			});
+		}
+	});
+};
 
 const getPossibleTakes = (pieces, movement, piece) => {
 	return pieces.some((p) => {
@@ -186,7 +246,9 @@ const getKingMovements = (piece, x, y, pieces) => {
 			: movement;
 	});
 
-	filteredMovements.forEach
+	filteredMovements.forEach((movement) => {
+		console.log(isValidKingMovement(pieces, movement, piece));
+	});
 
 	return filteredMovements;
 };

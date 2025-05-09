@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import Board from "./components/board";
 import { useState } from "react";
 
+// Types para mostrar capturas
 let types = ["pawn", "knight", "bishop", "rook", "queen", "king"];
 
 // Definimos orientación de tablero
