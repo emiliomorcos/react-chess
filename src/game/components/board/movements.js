@@ -24,6 +24,19 @@ const getFriendlyCollisions = (pieces, movement, piece) => {
 	});
 };
 
+
+
+const isValidKingMovement = (pieces, movement, piece) => {
+	const { color: kingColor, x: kingX, y: kingY } = piece;
+	const enemyPieces = pieces.filter((p) => p.color !== kingColor);
+
+	const enemyPossibleMovements = [];
+
+	enemyPieces.forEach((enemyPiece))
+
+
+}
+
 const getPossibleTakes = (pieces, movement, piece) => {
 	return pieces.some((p) => {
 		return (
@@ -173,7 +186,7 @@ const getKingMovements = (piece, x, y, pieces) => {
 			: movement;
 	});
 
-	console.log("filteredMovements", filteredMovements);
+	filteredMovements.forEach
 
 	return filteredMovements;
 };

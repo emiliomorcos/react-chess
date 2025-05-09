@@ -24,9 +24,6 @@ const Game = () => {
 	const [capturesTop, setCapturesTop] = useState([]);
 	const [capturesBottom, setCapturesBottom] = useState([]);
 
-	console.log("captures top", capturesTop);
-	console.log("captures bottom", capturesBottom);
-
 	const numbers = defineNumbers(gameType);
 
 	const color = gameType.split("_")[1];
@@ -46,16 +43,29 @@ const Game = () => {
 						const tempTypeList = capturesTop.filter((capture) => {
 							return capture.type === type;
 						});
+
+						var extraWidth = 0;
+						if (tempTypeList.length > 1) {
+							extraWidth += 10 * (tempTypeList.length - 1);
+						}
+
 						return (
-							<div key={type} id={`topCaptured${type}`}>
+							<div
+								key={type}
+								id={`topCaptured${type}`}
+								style={{
+									width: tempTypeList.length
+										? `calc(5vh + ${extraWidth}px)`
+										: undefined,
+								}}
+							>
 								{tempTypeList.map((piece, idx) => {
 									return (
 										<img
 											style={{
 												position: "absolute",
+												bottom: 2,
 												left: 10 * idx,
-												top: 0,
-												bottom: 50,
 											}}
 											key={piece.name}
 											src={`/${piece.image}`}
@@ -89,7 +99,47 @@ const Game = () => {
 							? player1
 							: player2}
 					</h2>
-					<div className="captures">Capturas</div>
+					<div className="captures">
+						{types.map((type) => {
+							const tempTypeList = capturesBottom.filter(
+								(capture) => {
+									return capture.type === type;
+								}
+							);
+
+							var extraWidth = 0;
+							if (tempTypeList.length > 1) {
+								extraWidth += 10 * (tempTypeList.length - 1);
+							}
+
+							return (
+								<div
+									key={type}
+									id={`bottomCaptured${type}`}
+									style={{
+										width: tempTypeList.length
+											? `calc(5vh + ${extraWidth}px)`
+											: undefined,
+									}}
+								>
+									{tempTypeList.map((piece, idx) => {
+										return (
+											<img
+												style={{
+													position: "absolute",
+													bottom: 2,
+													left: 10 * idx,
+												}}
+												key={piece.name}
+												src={`/${piece.image}`}
+												alt={piece.name}
+											></img>
+										);
+									})}
+								</div>
+							);
+						})}
+					</div>
 				</div>
 
 				<div className="buttons-game">
