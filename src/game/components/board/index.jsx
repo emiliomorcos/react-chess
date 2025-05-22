@@ -121,7 +121,13 @@ const Board = ({
 				break;
 
 			case "king":
-				possibleMovements = getKingMovements(piece, x, y, pieces);
+				possibleMovements = getKingMovements(
+					piece,
+					x,
+					y,
+					pieces,
+					darkOnTop
+				);
 				break;
 
 			case "rook":

@@ -1,8 +1,30 @@
-// Función para obtener los movimientos posibles de una pieza Y saber los movimientos válidos de un rey
-const getPieceMovements = (piece, x, y, pieces) => {
+// Función para obtener los movimientos posibles de una pieza Y saber si empatan con los movimientos de un rey
+const getPieceMovements = (piece, x, y, pieces, darkOnTop) => {
 	var possibleMovements = [];
 
 	switch (piece.type) {
+		case "pawn":
+			possibleMovements = darkOnTop
+				? piece.color === "dark"
+					? [
+							{ x: x - 1, y: y + 1 },
+							{ x: x + 1, y: y + 1 },
+					  ]
+					: [
+							{ x: x - 1, y: y - 1 },
+							{ x: x + 1, y: y - 1 },
+					  ]
+				: piece.color === "dark"
+				? [
+						{ x: x - 1, y: y - 1 },
+						{ x: x + 1, y: y - 1 },
+				  ]
+				: [
+						{ x: x - 1, y: y + 1 },
+						{ x: x + 1, y: y + 1 },
+				  ];
+			break;
+
 		case "knight":
 			possibleMovements = getKnightMovements(piece, x, y, pieces);
 			break;
@@ -75,26 +97,33 @@ const getFriendlyCollisions = (pieces, movement, piece) => {
 	});
 };
 
-const isValidKingMovement = (pieces, movement, piece) => {
+// Identficar los posibles movmientos de un rey tomando en cuenta la visión de las piezas enemigas
+const isValidKingMovement = (pieces, movement, piece, darkOnTop) => {
 	const { color: kingColor } = piece;
 	const { x, y } = movement;
 	const enemyPieces = pieces.filter((p) => p.color !== kingColor);
 
-	enemyPieces.forEach((enemyPiece) => {
-		if (enemyPiece.type === "pawn") {
-		} else {
-			const enemyPieceMovements = getPieceMovements(
-				enemyPiece,
-				enemyPiece.position.x,
-				enemyPiece.position.y,
-				pieces
-			);
+	for (let i = 0; i < enemyPieces.length; i++) {
+		var enemyPiece = enemyPieces[i];
 
-			return !enemyPieceMovements.some((enemyPM) => {
+		const enemyPieceMovements = getPieceMovements(
+			enemyPiece,
+			enemyPiece.position.x,
+			enemyPiece.position.y,
+			pieces,
+			darkOnTop
+		);
+
+		if (
+			enemyPieceMovements.length &&
+			enemyPieceMovements.some((enemyPM) => {
 				return enemyPM.x === x && enemyPM.y === y;
-			});
+			})
+		) {
+			return false;
 		}
-	});
+	}
+	return true;
 };
 
 const getPossibleTakes = (pieces, movement, piece) => {
@@ -221,7 +250,7 @@ const getKnightMovements = (piece, x, y, pieces) => {
 };
 
 // ----------- KINGS -----------
-const getKingMovements = (piece, x, y, pieces) => {
+const getKingMovements = (piece, x, y, pieces, darkOnTop) => {
 	var possibleMovements = [
 		{ x: x - 1, y: y - 1 },
 		{ x: x - 1, y: y },
@@ -246,8 +275,8 @@ const getKingMovements = (piece, x, y, pieces) => {
 			: movement;
 	});
 
-	filteredMovements.forEach((movement) => {
-		console.log(isValidKingMovement(pieces, movement, piece));
+	var filteredMovements = filteredMovements.filter((movement) => {
+		return isValidKingMovement(pieces, movement, piece, darkOnTop);
 	});
 
 	return filteredMovements;
