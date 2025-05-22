@@ -65,6 +65,7 @@ const Board = ({
 					y
 				);
 
+				console.log("ENTRE HASTA SET PIECE");
 				setPieces(tempPieces);
 				setSelectedPiece(null);
 				setPossiblePieceMovements([]);
@@ -131,14 +132,35 @@ const Board = ({
 				break;
 
 			case "rook":
-				possibleMovements = getRookMovements(piece, x, y, pieces);
+				possibleMovements = getRookMovements(
+					piece,
+					x,
+					y,
+					pieces,
+					darkOnTop,
+					true
+				);
 				break;
 
 			case "bishop":
-				possibleMovements = getBishopMovements(piece, x, y, pieces);
+				possibleMovements = getBishopMovements(
+					piece,
+					x,
+					y,
+					pieces,
+					darkOnTop,
+					true
+				);
 				break;
 			case "queen":
-				possibleMovements = getQueenMovements(piece, x, y, pieces);
+				possibleMovements = getQueenMovements(
+					piece,
+					x,
+					y,
+					pieces,
+					darkOnTop,
+					true
+				);
 				break;
 		}
 
