@@ -9,6 +9,7 @@ import {
 	getBishopMovements,
 	getQueenMovements,
 	movePieceOnTake,
+	isKingOnCheck,
 } from "./movements";
 
 // Generamos tablero
@@ -29,6 +30,8 @@ const Board = ({
 	const [pieces, setPieces] = useState(defineInitialPositions(numbers));
 	const [possiblePieceMovements, setPossiblePieceMovements] = useState([]);
 	const [selectedPiece, setSelectedPiece] = useState(null);
+	const [lightKingOnCheck, setLightKingOnCheck] = useState(false);
+	const [darkKingOnCheck, setDarkKingOnCheck] = useState(false);
 
 	// Definimos colores de cuadros con base en matriz y determinamos si hay una pieza en un square
 	const getSquareClassname = (x, y, hasPiece) => {
@@ -46,6 +49,30 @@ const Board = ({
 			selectedPiece.position.y === y
 				? " selected-piece"
 				: "";
+
+		if (lightKingOnCheck || darkKingOnCheck) {
+			const lightKing = pieces.find((p) => {
+				return p.type === "king" && p.color === "light";
+			});
+			const darkKing = pieces.find((p) => {
+				return p.type === "king" && p.color === "dark";
+			});
+
+			classname +=
+				lightKingOnCheck &&
+				lightKing.position.x === x &&
+				lightKing.position.y === y
+					? " king-on-check"
+					: "";
+
+			classname +=
+				darkKingOnCheck &&
+				darkKing.position.x === x &&
+				darkKing.position.y === y
+					? " king-on-check"
+					: "";
+		}
+
 		return classname;
 	};
 	// Definimos función para manejar el click de una pieza
@@ -65,10 +92,33 @@ const Board = ({
 					y
 				);
 
-				console.log("ENTRE HASTA SET PIECE");
 				setPieces(tempPieces);
-				setSelectedPiece(null);
 				setPossiblePieceMovements([]);
+
+				// Revisar si el rey opuesto está en jaque
+				const tempKing = pieces.find((p) => {
+					return p.type === "king" && p.color !== selectedPiece.color;
+				});
+
+				const kingOnCheck = !isKingOnCheck(
+					pieces,
+					tempKing.position,
+					tempKing,
+					darkOnTop
+				);
+
+				if (kingOnCheck) {
+					if (tempKing.color === "light") {
+						setLightKingOnCheck(true);
+					} else {
+						setDarkKingOnCheck(true);
+					}
+				} else {
+					setLightKingOnCheck(false);
+					setDarkKingOnCheck(false);
+				}
+
+				setSelectedPiece(null);
 			}
 			return;
 		}
@@ -96,9 +146,8 @@ const Board = ({
 			tempPieces = movePieceOnTake(tempPieces, selectedPiece, x, y);
 
 			setPieces(tempPieces);
-			setSelectedPiece(null);
 			setPossiblePieceMovements([]);
-
+			setSelectedPiece(null);
 			return;
 		}
 
@@ -113,12 +162,20 @@ const Board = ({
 					x,
 					y,
 					darkOnTop,
-					pieces
+					pieces,
+					true
 				);
 				break;
 
 			case "knight":
-				possibleMovements = getKnightMovements(piece, x, y, pieces);
+				possibleMovements = getKnightMovements(
+					piece,
+					x,
+					y,
+					pieces,
+					darkOnTop,
+					true
+				);
 				break;
 
 			case "king":

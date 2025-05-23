@@ -158,7 +158,14 @@ const isInsideBoard = (x, y) => {
 
 // ----------- PAWNS -----------
 // TODO: EN PASSANT
-const getPawnMovements = (piece, x, y, darkOnTop, pieces) => {
+const getPawnMovements = (
+	piece,
+	x,
+	y,
+	darkOnTop,
+	pieces,
+	fromBoard = false
+) => {
 	var possibleMovements = [];
 
 	possibleMovements = darkOnTop
@@ -220,7 +227,7 @@ const getPawnMovements = (piece, x, y, darkOnTop, pieces) => {
 				{ x: x - 1, y: y + 1 },
 		  ];
 
-	const filteredMovements = possibleMovements.filter((movement) => {
+	var filteredMovements = possibleMovements.filter((movement) => {
 		return (
 			isInsideBoard(movement.x, movement.y) &&
 			getFriendlyCollisions(pieces, movement, piece) === false
@@ -233,11 +240,43 @@ const getPawnMovements = (piece, x, y, darkOnTop, pieces) => {
 		}
 	});
 
+	if (fromBoard) {
+		const tempKing = pieces.find((p) => {
+			return p.type === "king" && p.color === piece.color;
+		});
+
+		filteredMovements = filteredMovements.filter((movement) => {
+			var tempPieces = JSON.parse(JSON.stringify(pieces));
+
+			var tempPieces = movePieceOnTake(
+				tempPieces,
+				piece,
+				movement.x,
+				movement.y,
+				movement.isTake
+			);
+
+			return isKingOnCheck(
+				tempPieces,
+				tempKing.position,
+				tempKing,
+				darkOnTop
+			);
+		});
+	}
+
 	return filteredMovements;
 };
 
 // ----------- KNIGHTS -----------
-const getKnightMovements = (piece, x, y, pieces) => {
+const getKnightMovements = (
+	piece,
+	x,
+	y,
+	pieces,
+	darkOnTop,
+	fromBoard = false
+) => {
 	var possibleMovements = [
 		{ x: x - 2, y: y - 1 },
 		{ x: x - 2, y: y + 1 },
@@ -261,6 +300,31 @@ const getKnightMovements = (piece, x, y, pieces) => {
 			? { ...movement, isTake: true }
 			: movement;
 	});
+
+	if (fromBoard) {
+		const tempKing = pieces.find((p) => {
+			return p.type === "king" && p.color === piece.color;
+		});
+
+		filteredMovements = filteredMovements.filter((movement) => {
+			var tempPieces = JSON.parse(JSON.stringify(pieces));
+
+			var tempPieces = movePieceOnTake(
+				tempPieces,
+				piece,
+				movement.x,
+				movement.y,
+				movement.isTake
+			);
+
+			return isKingOnCheck(
+				tempPieces,
+				tempKing.position,
+				tempKing,
+				darkOnTop
+			);
+		});
+	}
 
 	return filteredMovements;
 };
@@ -450,10 +514,17 @@ const getBishopMovements = (
 };
 
 // ----------- QUEEN -----------
-const getQueenMovements = (piece, x, y, pieces) => {
+const getQueenMovements = (
+	piece,
+	x,
+	y,
+	pieces,
+	darkOnTop,
+	fromBoard = false
+) => {
 	var possibleMovements = [
-		...getRookMovements(piece, x, y, pieces),
-		...getBishopMovements(piece, x, y, pieces),
+		...getRookMovements(piece, x, y, pieces, darkOnTop, fromBoard),
+		...getBishopMovements(piece, x, y, pieces, darkOnTop, fromBoard),
 	];
 
 	return possibleMovements;
@@ -467,4 +538,5 @@ export {
 	getBishopMovements,
 	getQueenMovements,
 	movePieceOnTake,
+	isKingOnCheck,
 };

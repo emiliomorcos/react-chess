@@ -37,6 +37,10 @@
 	background-color: hsl(65, 84%, 70%);
 }
 
+.square.king-on-check {
+	background-color: hsl(0, 84%, 70%);
+}
+
 .square-light {
 	background-color: var(--board-light);
 	color: var(--board-dark);
