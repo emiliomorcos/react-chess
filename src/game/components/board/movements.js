@@ -330,7 +330,14 @@ const getKnightMovements = (
 };
 
 // ----------- KINGS -----------
-const getKingMovements = (piece, x, y, pieces, darkOnTop) => {
+const getKingMovements = (
+	piece,
+	x,
+	y,
+	pieces,
+	darkOnTop,
+	fromBoard = false
+) => {
 	var possibleMovements = [
 		{ x: x - 1, y: y - 1 },
 		{ x: x - 1, y: y },
@@ -355,9 +362,30 @@ const getKingMovements = (piece, x, y, pieces, darkOnTop) => {
 			: movement;
 	});
 
-	var filteredMovements = filteredMovements.filter((movement) => {
-		return isKingOnCheck(pieces, movement, piece, darkOnTop);
-	});
+	if (fromBoard) {
+		const tempKing = pieces.find((p) => {
+			return p.type === "king" && p.color === piece.color;
+		});
+
+		filteredMovements = filteredMovements.filter((movement) => {
+			var tempPieces = JSON.parse(JSON.stringify(pieces));
+
+			var tempPieces = movePieceOnTake(
+				tempPieces,
+				piece,
+				movement.x,
+				movement.y,
+				movement.isTake
+			);
+
+			return isKingOnCheck(
+				tempPieces,
+				{ x: movement.x, y: movement.y },
+				tempKing,
+				darkOnTop
+			);
+		});
+	}
 
 	return filteredMovements;
 };

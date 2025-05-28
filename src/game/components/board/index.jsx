@@ -118,6 +118,9 @@ const Board = ({
 					setDarkKingOnCheck(false);
 				}
 
+				// Revisar si hay jaque mate
+				//Checar si hay algun movimimento posible para piezas del color del rey
+
 				setSelectedPiece(null);
 			}
 			return;
@@ -147,6 +150,33 @@ const Board = ({
 
 			setPieces(tempPieces);
 			setPossiblePieceMovements([]);
+
+			// Revisar si el rey opuesto está en jaque
+			const tempKing = pieces.find((p) => {
+				return p.type === "king" && p.color !== selectedPiece.color;
+			});
+
+			const kingOnCheck = !isKingOnCheck(
+				pieces,
+				tempKing.position,
+				tempKing,
+				darkOnTop
+			);
+
+			if (kingOnCheck) {
+				if (tempKing.color === "light") {
+					setLightKingOnCheck(true);
+				} else {
+					setDarkKingOnCheck(true);
+				}
+			} else {
+				setLightKingOnCheck(false);
+				setDarkKingOnCheck(false);
+			}
+
+			//Revisar si hay jaque mate
+			//Checar si hay algun movimimento posible para piezas del color del rey
+
 			setSelectedPiece(null);
 			return;
 		}
@@ -184,7 +214,8 @@ const Board = ({
 					x,
 					y,
 					pieces,
-					darkOnTop
+					darkOnTop,
+					true
 				);
 				break;
 
