@@ -10,6 +10,7 @@ import {
 	getQueenMovements,
 	movePieceOnTake,
 	isKingOnCheck,
+	getPieceMovements,
 } from "./movements";
 
 // Generamos tablero
@@ -30,8 +31,13 @@ const Board = ({
 	const [pieces, setPieces] = useState(defineInitialPositions(numbers));
 	const [possiblePieceMovements, setPossiblePieceMovements] = useState([]);
 	const [selectedPiece, setSelectedPiece] = useState(null);
+
 	const [lightKingOnCheck, setLightKingOnCheck] = useState(false);
 	const [darkKingOnCheck, setDarkKingOnCheck] = useState(false);
+
+	const [checkmate, setCheckmate] = useState(false);
+	const [stalemate, setStalemate] = useState(false);
+	const [winner, setWinner] = useState("");
 
 	// Definimos colores de cuadros con base en matriz y determinamos si hay una pieza en un square
 	const getSquareClassname = (x, y, hasPiece) => {
@@ -84,6 +90,7 @@ const Board = ({
 		isPossibleTake
 	) => {
 		if (!hasPiece) {
+			// -------------------- POSSIBLE MOVEMENT --------------------
 			if (isPossibleMovement) {
 				const tempPieces = movePieceOnTake(
 					[...pieces],
@@ -118,8 +125,43 @@ const Board = ({
 					setDarkKingOnCheck(false);
 				}
 
-				// Revisar si hay jaque mate
+				// Revisar si hay jaque mate o stalemate
 				//Checar si hay algun movimimento posible para piezas del color del rey
+
+				const friendlyPieces = tempPieces.filter(
+					(p) => p.color === tempKing.color
+				);
+
+				var noMovesLeft = true;
+
+				for (let i = 0; i < friendlyPieces.length; i++) {
+					var friendlyPiece = friendlyPieces[i];
+
+					const friendlyPieceMovements = getPieceMovements(
+						friendlyPiece,
+						friendlyPiece.position.x,
+						friendlyPiece.position.y,
+						tempPieces,
+						darkOnTop,
+						true
+					);
+
+					if (friendlyPieceMovements.length) {
+						noMovesLeft = false;
+						break;
+					}
+				}
+
+				if (noMovesLeft) {
+					if (kingOnCheck) {
+						setCheckmate(true);
+						setWinner(
+							tempKing.color === "light" ? "dark" : "light"
+						);
+					} else {
+						setStalemate(true);
+					}
+				}
 
 				setSelectedPiece(null);
 			}
@@ -130,7 +172,8 @@ const Board = ({
 			return p.position.x === x && p.position.y === y;
 		});
 
-		// Checar si el square con pieza es un possible movement && isTake === true
+		// -------------------- POSSIBLE TAKE --------------------
+		//  Checar si el square con pieza es un possible movement && isTake === true
 		if (isPossibleTake) {
 			// Agregamos como captura la pieza clickeada
 			if (darkOnTop) {
@@ -174,8 +217,41 @@ const Board = ({
 				setDarkKingOnCheck(false);
 			}
 
-			//Revisar si hay jaque mate
+			//Revisar si hay jaque mate o stalemate
 			//Checar si hay algun movimimento posible para piezas del color del rey
+
+			const friendlyPieces = tempPieces.filter(
+				(p) => p.color === tempKing.color
+			);
+
+			var noMovesLeft = true;
+
+			for (let i = 0; i < friendlyPieces.length; i++) {
+				var friendlyPiece = friendlyPieces[i];
+
+				const friendlyPieceMovements = getPieceMovements(
+					friendlyPiece,
+					friendlyPiece.position.x,
+					friendlyPiece.position.y,
+					tempPieces,
+					darkOnTop,
+					true
+				);
+
+				if (friendlyPieceMovements.length) {
+					noMovesLeft = false;
+					break;
+				}
+			}
+
+			if (noMovesLeft) {
+				if (kingOnCheck) {
+					setCheckmate(true);
+					setWinner(tempKing.color === "light" ? "dark" : "light");
+				} else {
+					setStalemate(true);
+				}
+			}
 
 			setSelectedPiece(null);
 			return;
@@ -254,7 +330,9 @@ const Board = ({
 
 		setPossiblePieceMovements(possibleMovements);
 	};
+
 	// AQUI
+	console.log(checkmate, stalemate, winner);
 	return (
 		<div className="board">
 			{numbers.map((number, y) => {

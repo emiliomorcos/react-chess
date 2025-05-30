@@ -1,10 +1,19 @@
 // Función para obtener los movimientos posibles de una pieza Y saber si empatan con los movimientos de un rey
-const getPieceMovements = (piece, x, y, pieces, darkOnTop) => {
+const getPieceMovements = (
+	piece,
+	x,
+	y,
+	pieces,
+	darkOnTop,
+	fromBoard = false
+) => {
 	var possibleMovements = [];
 
 	switch (piece.type) {
 		case "pawn":
-			possibleMovements = darkOnTop
+			possibleMovements = fromBoard
+				? getPawnMovements(piece, x, y, darkOnTop, pieces, fromBoard)
+				: darkOnTop
 				? piece.color === "dark"
 					? [
 							{ x: x - 1, y: y + 1 },
@@ -26,15 +35,31 @@ const getPieceMovements = (piece, x, y, pieces, darkOnTop) => {
 			break;
 
 		case "knight":
-			possibleMovements = getKnightMovements(piece, x, y, pieces);
+			possibleMovements = getKnightMovements(
+				piece,
+				x,
+				y,
+				pieces,
+				darkOnTop,
+				fromBoard
+			);
 			break;
 
 		case "king":
-			possibleMovements = getKingRawMovements(piece, x, y, pieces);
+			possibleMovements = fromBoard
+				? getKingMovements(piece, x, y, pieces, darkOnTop, fromBoard)
+				: getKingRawMovements(piece, x, y, pieces);
 			break;
 
 		case "rook":
-			possibleMovements = getRookMovements(piece, x, y, pieces);
+			possibleMovements = getRookMovements(
+				piece,
+				x,
+				y,
+				pieces,
+				darkOnTop,
+				fromBoard
+			);
 			break;
 
 		case "bishop":
@@ -43,11 +68,20 @@ const getPieceMovements = (piece, x, y, pieces, darkOnTop) => {
 				x,
 				y,
 				pieces,
+				darkOnTop,
+				fromBoard,
 				darkOnTop
 			);
 			break;
 		case "queen":
-			possibleMovements = getQueenMovements(piece, x, y, pieces);
+			possibleMovements = getQueenMovements(
+				piece,
+				x,
+				y,
+				pieces,
+				darkOnTop,
+				fromBoard
+			);
 			break;
 	}
 
@@ -567,4 +601,5 @@ export {
 	getQueenMovements,
 	movePieceOnTake,
 	isKingOnCheck,
+	getPieceMovements,
 };
