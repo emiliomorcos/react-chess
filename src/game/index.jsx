@@ -2,6 +2,7 @@ import "./game.css";
 import { useParams } from "react-router-dom";
 import Board from "./components/board";
 import { useState } from "react";
+import EndgameModal from "./components/endgameModal";
 
 // Types para mostrar capturas
 let types = ["pawn", "knight", "bishop", "rook", "queen", "king"];
@@ -24,6 +25,10 @@ const Game = () => {
 
 	const [capturesTop, setCapturesTop] = useState([]);
 	const [capturesBottom, setCapturesBottom] = useState([]);
+
+	const [checkmate, setCheckmate] = useState(false);
+	const [stalemate, setStalemate] = useState(false);
+	const [winner, setWinner] = useState("");
 
 	const numbers = defineNumbers(gameType);
 
@@ -86,9 +91,24 @@ const Game = () => {
 					setCapturesTop={setCapturesTop}
 					capturesBottom={capturesBottom}
 					setCapturesBottom={setCapturesBottom}
+					checkmate={checkmate}
+					setCheckmate={setCheckmate}
+					stalemate={stalemate}
+					setStalemate={setStalemate}
+					winner={winner}
+					setWinner={setWinner}
 				/>
 				<div className="history">
 					<div>Texto</div>
+					{(checkmate || stalemate) && (
+						<EndgameModal
+							checkmate={checkmate}
+							winner={winner}
+							numbers={numbers}
+							player1={player1}
+							player2={player2}
+						/>
+					)}
 				</div>
 			</div>
 			<div className="bottom">

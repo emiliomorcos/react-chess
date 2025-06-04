@@ -20,6 +20,12 @@ const Board = ({
 	setCapturesTop,
 	capturesBottom,
 	setCapturesBottom,
+	checkmate,
+	setCheckmate,
+	stalemate,
+	setStalemate,
+	winner,
+	setWinner,
 }) => {
 	const darkOnTop = numbers[0] === "8";
 
@@ -34,10 +40,6 @@ const Board = ({
 
 	const [lightKingOnCheck, setLightKingOnCheck] = useState(false);
 	const [darkKingOnCheck, setDarkKingOnCheck] = useState(false);
-
-	const [checkmate, setCheckmate] = useState(false);
-	const [stalemate, setStalemate] = useState(false);
-	const [winner, setWinner] = useState("");
 
 	// Definimos colores de cuadros con base en matriz y determinamos si hay una pieza en un square
 	const getSquareClassname = (x, y, hasPiece) => {
@@ -89,6 +91,9 @@ const Board = ({
 		isPossibleMovement,
 		isPossibleTake
 	) => {
+		if (checkmate || stalemate) {
+			return;
+		}
 		if (!hasPiece) {
 			// -------------------- POSSIBLE MOVEMENT --------------------
 			if (isPossibleMovement) {
@@ -332,7 +337,6 @@ const Board = ({
 	};
 
 	// AQUI
-	console.log(checkmate, stalemate, winner);
 	return (
 		<div className="board">
 			{numbers.map((number, y) => {
