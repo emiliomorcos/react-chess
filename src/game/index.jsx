@@ -26,6 +26,8 @@ const Game = () => {
 	const [capturesTop, setCapturesTop] = useState([]);
 	const [capturesBottom, setCapturesBottom] = useState([]);
 
+	const [turn, setTurn] = useState("light");
+
 	const [checkmate, setCheckmate] = useState(false);
 	const [stalemate, setStalemate] = useState(false);
 	const [winner, setWinner] = useState("");
@@ -34,10 +36,22 @@ const Game = () => {
 
 	const color = gameType.split("_")[1];
 
+	const darkOnTop = numbers[0] === "8";
+
 	return (
 		<div className="game">
 			<div className="top">
-				<h2>
+				<h2
+					className={
+						darkOnTop
+							? turn === "dark"
+								? "turn"
+								: ""
+							: turn === "light"
+							? "turn"
+							: ""
+					}
+				>
 					{gameType === "two-players"
 						? player2
 						: color === "white"
@@ -97,6 +111,8 @@ const Game = () => {
 					setStalemate={setStalemate}
 					winner={winner}
 					setWinner={setWinner}
+					turn={turn}
+					setTurn={setTurn}
 				/>
 				<div className="history">
 					<div>Texto</div>
@@ -113,7 +129,17 @@ const Game = () => {
 			</div>
 			<div className="bottom">
 				<div className="player-info">
-					<h2>
+					<h2
+						className={
+							darkOnTop
+								? turn === "dark"
+									? ""
+									: "turn"
+								: turn === "light"
+								? ""
+								: "turn"
+						}
+					>
 						{gameType === "two-players"
 							? player1
 							: color === "white"

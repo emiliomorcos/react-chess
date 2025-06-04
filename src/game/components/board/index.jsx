@@ -26,6 +26,8 @@ const Board = ({
 	setStalemate,
 	winner,
 	setWinner,
+	turn,
+	setTurn,
 }) => {
 	const darkOnTop = numbers[0] === "8";
 
@@ -158,6 +160,7 @@ const Board = ({
 				}
 
 				if (noMovesLeft) {
+					setTurn("");
 					if (kingOnCheck) {
 						setCheckmate(true);
 						setWinner(
@@ -169,6 +172,11 @@ const Board = ({
 				}
 
 				setSelectedPiece(null);
+				if (turn === "light") {
+					setTurn("dark");
+				} else {
+					setTurn("light");
+				}
 			}
 			return;
 		}
@@ -250,6 +258,7 @@ const Board = ({
 			}
 
 			if (noMovesLeft) {
+				setTurn("");
 				if (kingOnCheck) {
 					setCheckmate(true);
 					setWinner(tempKing.color === "light" ? "dark" : "light");
@@ -259,9 +268,18 @@ const Board = ({
 			}
 
 			setSelectedPiece(null);
+			if (turn === "light") {
+				setTurn("dark");
+			} else {
+				setTurn("light");
+			}
 			return;
 		}
 
+		// Si no es el turno de la pieza clickeada, no hacer nada
+		if (piece.color !== turn) {
+			return;
+		}
 		setSelectedPiece(piece);
 
 		var possibleMovements = [];
