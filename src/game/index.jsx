@@ -28,6 +28,8 @@ const Game = () => {
 
 	const [turn, setTurn] = useState("light");
 
+	const [history, setHistory] = useState([]);
+
 	const [checkmate, setCheckmate] = useState(false);
 	const [stalemate, setStalemate] = useState(false);
 	const [winner, setWinner] = useState("");

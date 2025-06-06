@@ -592,6 +592,45 @@ const getQueenMovements = (
 	return possibleMovements;
 };
 
+const getMovementString = (piece, pieces, x, y, isTake, isKingOnCheck) => {
+	if (piece.type === "knight" || piece.type === "rook") {
+	}
+};
+
+const getMovementsInCommon = (
+	piece1Movements,
+	piece2,
+	pieces,
+	darkOnTop,
+	fromBoard
+) => {
+	const piece2Movements =
+		piece2.type === "knight"
+			? getKnightMovements(
+					piece2,
+					piece2.position.x,
+					piece2.position.y,
+					pieces,
+					darkOnTop,
+					fromBoard
+			  )
+			: getRookMovements(
+					piece2,
+					piece2.position.x,
+					piece2.position.y,
+					pieces,
+					darkOnTop,
+					fromBoard
+			  );
+
+	const commonMovements = piece1Movements.filter((movement) => {
+		return piece2Movements.includes(movement);
+	});
+	console.log(commonMovements);
+	return commonMovements;
+	// MI FUNCION AÚN NO ESTÁ FUNBCIONANDO CORRECTAMENTE !!! Le falta el some()
+};
+
 export {
 	getPawnMovements,
 	getKnightMovements,
@@ -602,4 +641,6 @@ export {
 	movePieceOnTake,
 	isKingOnCheck,
 	getPieceMovements,
+	getMovementString,
+	getMovementsInCommon,
 };

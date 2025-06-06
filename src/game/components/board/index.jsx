@@ -11,6 +11,7 @@ import {
 	movePieceOnTake,
 	isKingOnCheck,
 	getPieceMovements,
+	getMovementsInCommon,
 } from "./movements";
 
 // Generamos tablero
@@ -113,6 +114,30 @@ const Board = ({
 				const tempKing = pieces.find((p) => {
 					return p.type === "king" && p.color !== selectedPiece.color;
 				});
+
+				var pieceCommonMovements = [];
+
+				if (
+					selectedPiece.type === "knight" ||
+					selectedPiece.type === "rook"
+				) {
+					const commonPiece = pieces.find((p) => {
+						return (
+							p.type === selectedPiece.type &&
+							p.color === selectedPiece.color &&
+							p.name !== selectedPiece.name
+						);
+					});
+					if (commonPiece) {
+						pieceCommonMovements = getMovementsInCommon(
+							possiblePieceMovements,
+							commonPiece,
+							pieces,
+							darkOnTop,
+							true
+						);
+					}
+				}
 
 				const kingOnCheck = !isKingOnCheck(
 					pieces,
