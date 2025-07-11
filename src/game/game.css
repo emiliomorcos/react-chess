@@ -41,6 +41,21 @@ h2.turn {
 	position: relative;
 	width: calc(var(--square-size) * 8);
 	border: solid 1px var(--board-light);
+	overflow-y: auto;
+}
+
+.row {
+	display: flex;
+	align-items: center;
+	justify-content: space-evenly;
+}
+
+.row.gray {
+	background-color: rgb(86, 86, 86);
+}
+
+.row div {
+	width: 30%;
 }
 
 .bottom {

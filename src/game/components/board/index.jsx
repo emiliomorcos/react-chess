@@ -1,5 +1,5 @@
 import "./board.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { defineInitialPositions } from "../../../constants";
 import {
 	getPawnMovements,
@@ -12,6 +12,7 @@ import {
 	isKingOnCheck,
 	getPieceMovements,
 	getMovementsInCommon,
+	getMovementString,
 } from "./movements";
 
 // Generamos tablero
@@ -29,6 +30,8 @@ const Board = ({
 	setWinner,
 	turn,
 	setTurn,
+	history,
+	setHistory,
 }) => {
 	const darkOnTop = numbers[0] === "8";
 
@@ -43,6 +46,26 @@ const Board = ({
 
 	const [lightKingOnCheck, setLightKingOnCheck] = useState(false);
 	const [darkKingOnCheck, setDarkKingOnCheck] = useState(false);
+	const [lastCoordinates, setLastCoordinates] = useState({});
+
+	useEffect(() => {
+		if (selectedPiece) {
+			var x = selectedPiece.position.x;
+			var y = selectedPiece.position.y;
+			setLastCoordinates({ x, y });
+		}
+	}, [selectedPiece]);
+
+	const getNewHistory = (piece, movementString) => {
+		var tempHistory = [...history];
+		if (piece.color === "light") {
+			tempHistory.push({ light: movementString });
+		} else {
+			tempHistory[tempHistory.length - 1].dark = movementString;
+		}
+
+		return tempHistory;
+	};
 
 	// Definimos colores de cuadros con base en matriz y determinamos si hay una pieza en un square
 	const getSquareClassname = (x, y, hasPiece) => {
@@ -100,21 +123,6 @@ const Board = ({
 		if (!hasPiece) {
 			// -------------------- POSSIBLE MOVEMENT --------------------
 			if (isPossibleMovement) {
-				const tempPieces = movePieceOnTake(
-					[...pieces],
-					selectedPiece,
-					x,
-					y
-				);
-
-				setPieces(tempPieces);
-				setPossiblePieceMovements([]);
-
-				// Revisar si el rey opuesto está en jaque
-				const tempKing = pieces.find((p) => {
-					return p.type === "king" && p.color !== selectedPiece.color;
-				});
-
 				var pieceCommonMovements = [];
 
 				if (
@@ -138,6 +146,31 @@ const Board = ({
 						);
 					}
 				}
+
+				var isCommon = false;
+
+				if (
+					pieceCommonMovements.some((movement) => {
+						return movement.x === x && movement.y === y;
+					})
+				) {
+					isCommon = true;
+				}
+
+				const tempPieces = movePieceOnTake(
+					[...pieces],
+					selectedPiece,
+					x,
+					y
+				);
+
+				setPieces(tempPieces);
+				setPossiblePieceMovements([]);
+
+				// Revisar si el rey opuesto está en jaque
+				const tempKing = pieces.find((p) => {
+					return p.type === "king" && p.color !== selectedPiece.color;
+				});
 
 				const kingOnCheck = !isKingOnCheck(
 					pieces,
@@ -184,6 +217,23 @@ const Board = ({
 					}
 				}
 
+				const movementString = getMovementString(
+					selectedPiece,
+					pieces,
+					x,
+					y,
+					isPossibleTake,
+					kingOnCheck,
+					isCommon,
+					lastCoordinates,
+					darkOnTop
+				);
+
+				// Si se movió uno blanco -> creamos objeto en el arreglo history
+				// Si se movió uno negro -> lo agregamos al ultimo arreglo history
+				const newHistory = getNewHistory(selectedPiece, movementString);
+				setHistory(newHistory);
+
 				if (noMovesLeft) {
 					setTurn("");
 					if (kingOnCheck) {
@@ -213,6 +263,39 @@ const Board = ({
 		// -------------------- POSSIBLE TAKE --------------------
 		//  Checar si el square con pieza es un possible movement && isTake === true
 		if (isPossibleTake) {
+			var pieceCommonMovements = [];
+
+			if (
+				selectedPiece.type === "knight" ||
+				selectedPiece.type === "rook"
+			) {
+				const commonPiece = pieces.find((p) => {
+					return (
+						p.type === selectedPiece.type &&
+						p.color === selectedPiece.color &&
+						p.name !== selectedPiece.name
+					);
+				});
+				if (commonPiece) {
+					pieceCommonMovements = getMovementsInCommon(
+						possiblePieceMovements,
+						commonPiece,
+						pieces,
+						darkOnTop,
+						true
+					);
+				}
+			}
+
+			var isCommon = false;
+
+			if (
+				pieceCommonMovements.some((movement) => {
+					return movement.x === x && movement.y === y;
+				})
+			) {
+				isCommon = true;
+			}
 			// Agregamos como captura la pieza clickeada
 			if (darkOnTop) {
 				piece.color === "dark"
@@ -261,6 +344,23 @@ const Board = ({
 			const friendlyPieces = tempPieces.filter(
 				(p) => p.color === tempKing.color
 			);
+
+			const movementString = getMovementString(
+				selectedPiece,
+				pieces,
+				x,
+				y,
+				isPossibleTake,
+				kingOnCheck,
+				isCommon,
+				lastCoordinates,
+				darkOnTop
+			);
+
+			// Si se movió uno blanco -> creamos objeto en el arreglo history
+			// Si se movió uno negro -> lo agregamos al ultimo arreglo history
+			const newHistory = getNewHistory(selectedPiece, movementString);
+			setHistory(newHistory);
 
 			var noMovesLeft = true;
 

@@ -592,9 +592,89 @@ const getQueenMovements = (
 	return possibleMovements;
 };
 
-const getMovementString = (piece, pieces, x, y, isTake, isKingOnCheck) => {
-	if (piece.type === "knight" || piece.type === "rook") {
+// ----------- MOVEMENT STRING -----------
+
+const getMovementString = (
+	piece,
+	pieces,
+	x,
+	y,
+	isTake,
+	isKingOnCheck,
+	isCommon,
+	lastCoordinates,
+	darkOnTop
+) => {
+	const xvalues = {
+		0: "a",
+		1: "b",
+		2: "c",
+		3: "d",
+		4: "e",
+		5: "f",
+		6: "g",
+		7: "h",
+	};
+
+	const typeLetter = {
+		rook: "R",
+		bishop: "B",
+		queen: "Q",
+		knight: "N",
+		king: "K",
+	};
+
+	var movementString = "";
+	if (piece.type === "pawn") {
+		if (isTake) {
+			movementString += darkOnTop
+				? xvalues[lastCoordinates.x]
+				: xvalues[7 - lastCoordinates.x];
+			movementString += "x";
+		}
+		movementString += darkOnTop ? xvalues[x] : xvalues[7 - x];
+		movementString += darkOnTop ? `${8 - y}` : `${y + 1}`;
+
+		if (isKingOnCheck) {
+			movementString += "+";
+		}
+	} else {
+		movementString += typeLetter[piece.type];
+
+		if (isCommon) {
+			const commonPiece = pieces.find((p) => {
+				return (
+					p.type === piece.type &&
+					p.color === piece.color &&
+					p.name !== piece.name
+				);
+			});
+
+			if (lastCoordinates.x === commonPiece.position.x) {
+				movementString += darkOnTop
+					? `${8 - lastCoordinates.y}`
+					: `${lastCoordinates.y + 1}`;
+			} else {
+				movementString += darkOnTop
+					? xvalues[lastCoordinates.x]
+					: xvalues[7 - lastCoordinates.x];
+			}
+		}
+
+		if (isTake) {
+			movementString += "x";
+		}
+
+		movementString += darkOnTop ? xvalues[x] : xvalues[7 - x];
+		movementString += darkOnTop ? `${8 - y}` : `${y + 1}`;
+
+		if (isKingOnCheck) {
+			movementString += "+";
+		}
+		// Comparar lasCoordinates y coordenadas de commonPiece
+		// Si la x es igual usamos la y (num), s la y es igual usamos la x (letra), si ninguno es igual usamos la x (letra)
 	}
+	return movementString;
 };
 
 const getMovementsInCommon = (
@@ -624,11 +704,11 @@ const getMovementsInCommon = (
 			  );
 
 	const commonMovements = piece1Movements.filter((movement) => {
-		return piece2Movements.includes(movement);
+		return piece2Movements.some((movement2) => {
+			return movement2.x === movement.x && movement2.y === movement.y;
+		});
 	});
-	console.log(commonMovements);
 	return commonMovements;
-	// MI FUNCION AÚN NO ESTÁ FUNBCIONANDO CORRECTAMENTE !!! Le falta el some()
 };
 
 export {

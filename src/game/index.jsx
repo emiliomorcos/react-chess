@@ -115,9 +115,26 @@ const Game = () => {
 					setWinner={setWinner}
 					turn={turn}
 					setTurn={setTurn}
+					history={history}
+					setHistory={setHistory}
 				/>
 				<div className="history">
-					<div>Texto</div>
+					<div>
+						<h2>Historial</h2>
+						{history.map((turn, idx) => {
+							return (
+								<div
+									className={`row ${
+										idx % 2 === 0 ? "black" : "gray"
+									}`}
+								>
+									<div>{idx + 1}.</div>
+									<div>{turn.light}</div>
+									<div>{turn.dark}</div>
+								</div>
+							);
+						})}
+					</div>
 					{(checkmate || stalemate) && (
 						<EndgameModal
 							checkmate={checkmate}
