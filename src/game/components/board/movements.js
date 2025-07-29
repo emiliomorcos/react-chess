@@ -126,7 +126,9 @@ const movePieceOnTake = (tempPieces, selectedPiece, x, y, isTake = false) => {
 
 		const tempRemovedPieceIndex = tempPieces.indexOf(tempRemovedPiece);
 
-		tempPieces.splice(tempRemovedPieceIndex, 1);
+		if (tempRemovedPiece) {
+			tempPieces.splice(tempRemovedPieceIndex, 1);
+		}
 	}
 
 	const pieceIndex = tempPieces.indexOf(tempPiece);
@@ -190,15 +192,66 @@ const isInsideBoard = (x, y) => {
 	return x >= 0 && x <= 7 && y >= 0 && y <= 7;
 };
 
+// FUNCION PARA CHECAR EN PASSANT
+const checkEnPassant = (pieces, piece, lastx, lasty) => {
+	// Checar si hay una pieza enemiga a la izquierda
+	const leftPiece = pieces.find((p) => {
+		return (
+			p.position.x === piece.position.x - 1 &&
+			p.position.y === piece.position.y &&
+			p.type === "pawn" &&
+			p.color !== piece.color
+		);
+	});
+
+	const rightPiece = pieces.find((p) => {
+		return (
+			p.position.x === piece.position.x + 1 &&
+			p.position.y === piece.position.y &&
+			p.type === "pawn" &&
+			p.color !== piece.color
+		);
+	});
+
+	if (leftPiece) {
+		// Checar si ese peon fue el último movimiento
+		if (
+			// checamos lastx y lasty por el peon en 0 y luego comparamos con leftpiece
+			lastx !== undefined &&
+			lasty !== NaN &&
+			leftPiece.position.x === lastx &&
+			leftPiece.position.y === lasty
+		) {
+			return true;
+		}
+	}
+
+	if (rightPiece) {
+		// Checar si ese peon fue el último movimiento
+		if (
+			// checamos lastx y lasty por el peon en 0 y luego comparamos con leftpiece
+			lastx !== undefined &&
+			lasty !== NaN &&
+			rightPiece.position.x === lastx &&
+			rightPiece.position.y === lasty
+		) {
+			// Si es posible, agregar movimiento a filteredMovements
+			return true;
+		}
+	}
+
+	return false;
+};
+
 // ----------- PAWNS -----------
-// TODO: EN PASSANT
 const getPawnMovements = (
 	piece,
 	x,
 	y,
 	darkOnTop,
 	pieces,
-	fromBoard = false
+	fromBoard = false,
+	lastMovement
 ) => {
 	var possibleMovements = [];
 
@@ -273,6 +326,85 @@ const getPawnMovements = (
 			filteredMovements.push({ ...take, isTake: true });
 		}
 	});
+
+	// ----------- EN PASSANT -----------
+	const xvalues = {
+		a: 7,
+		b: 6,
+		c: 5,
+		d: 4,
+		e: 3,
+		f: 2,
+		g: 1,
+		h: 0,
+	};
+
+	const darkxvalues = {
+		a: 0,
+		b: 1,
+		c: 2,
+		d: 3,
+		e: 4,
+		f: 5,
+		g: 6,
+		h: 7,
+	};
+
+	const lastx = darkOnTop
+		? darkxvalues[lastMovement[0]]
+		: xvalues[lastMovement[0]];
+	var lasty = lastMovement[1];
+	lasty = parseInt(lasty);
+
+	lasty = lasty ? (darkOnTop ? 8 - lasty : lasty - 1) : lasty;
+
+	// ----------- EN PASSANT fila 3 -----------
+	if (y === 3) {
+		//Pasar lastMovement de string a coordenadas (x,y)
+
+		if (darkOnTop && piece.color === "light") {
+			if (checkEnPassant(pieces, piece, lastx, lasty)) {
+				filteredMovements.push({
+					x: lastx,
+					y: lasty - 1,
+					isTake: true,
+				});
+			}
+		}
+
+		if (!darkOnTop && piece.color === "dark") {
+			if (checkEnPassant(pieces, piece, lastx, lasty)) {
+				filteredMovements.push({
+					x: lastx,
+					y: lasty - 1,
+					isTake: true,
+				});
+			}
+		}
+	}
+
+	// ----------- EN PASSANT fila 4 -----------
+	if (y === 4) {
+		if (!darkOnTop && piece.color === "light") {
+			if (checkEnPassant(pieces, piece, lastx, lasty)) {
+				filteredMovements.push({
+					x: lastx,
+					y: lasty + 1,
+					isTake: true,
+				});
+			}
+		}
+
+		if (darkOnTop && piece.color === "dark") {
+			if (checkEnPassant(pieces, piece, lastx, lasty)) {
+				filteredMovements.push({
+					x: lastx,
+					y: lasty + 1,
+					isTake: true,
+				});
+			}
+		}
+	}
 
 	if (fromBoard) {
 		const tempKing = pieces.find((p) => {
