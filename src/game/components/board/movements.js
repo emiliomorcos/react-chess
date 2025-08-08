@@ -495,6 +495,12 @@ const getKnightMovements = (
 	return filteredMovements;
 };
 
+/*
+1. que no se hayan movido rey ni torre
+2. que no haya piezas entre rey y torre
+3. que ningun cuadro entre rey y torre esté atacado
+*/
+
 // ----------- KINGS -----------
 const getKingMovements = (
 	piece,
@@ -527,6 +533,169 @@ const getKingMovements = (
 			? { ...movement, isTake: true }
 			: movement;
 	});
+
+	if (!piece.hasMoved) {
+		// Encontrar las torres amigas
+		const rook1 = pieces.find((p) => {
+			return p.type === "rook" && p.color === piece.color;
+		});
+
+		const rook2 = pieces.find((p) => {
+			return (
+				p.type === "rook" &&
+				p.color === piece.color &&
+				p.name !== rook1?.name
+			);
+		});
+		// ver si las torres amigas no se han movido
+		if (rook1 && !rook1.hasMoved) {
+			const rook1Movements = getRookMovements(
+				rook1,
+				rook1.position.x,
+				rook1.position.y,
+				pieces,
+				darkOnTop
+			);
+
+			var castle1 = false;
+
+			if (rook1.position.x === 0) {
+				if (rook1Movements.length >= 3) {
+					for (let i = 1; i < 4; i++) {
+						// Si no tiene el movimiento que se salga del for (que ya no cheque más)
+						if (
+							!rook1Movements.some((m) => {
+								return (
+									m.x === rook1.position.x + i &&
+									m.y === rook1.position.y
+								);
+							})
+						) {
+							castle1 = false;
+							break;
+						}
+						if (
+							!isKingOnCheck(
+								pieces,
+								{
+									x: rook1.position.x + i,
+									y: rook1.position.y,
+								},
+								piece,
+								darkOnTop
+							)
+						) {
+							castle1 = false;
+							break;
+						}
+						castle1 = true;
+					}
+				}
+				if (castle1) {
+					filteredMovements.push({
+						x: piece.position.x - 2,
+						y: piece.position.y,
+						isCastle: true,
+					});
+				}
+			} else {
+				// Rook 2 cuando mataron a Rook 1 (rook 2 toma el lugar de rook 1)
+				if (rook1Movements.length >= 2) {
+					for (let i = 2; i > 0; i--) {
+						// Si no tiene el movimiento que se salga del for (que ya no cheque más)
+						if (
+							!rook1Movements.some((m) => {
+								return (
+									m.x === rook1.position.x - i &&
+									m.y === rook1.position.y
+								);
+							})
+						) {
+							castle1 = false;
+							break;
+						}
+						if (
+							!isKingOnCheck(
+								pieces,
+								{
+									x: rook1.position.x - i,
+									y: rook1.position.y,
+								},
+								piece,
+								darkOnTop
+							)
+						) {
+							castle1 = false;
+							break;
+						}
+						castle1 = true;
+					}
+				}
+				if (castle1) {
+					filteredMovements.push({
+						x: piece.position.x + 2,
+						y: piece.position.y,
+						isCastle: true,
+					});
+				}
+			}
+		}
+
+		if (rook2 && !rook2.hasMoved) {
+			const rook2Movements = getRookMovements(
+				rook2,
+				rook2.position.x,
+				rook2.position.y,
+				pieces,
+				darkOnTop
+			);
+
+			var castle2 = false;
+
+			if (rook2Movements.length >= 2) {
+				for (let i = 2; i > 0; i--) {
+					// Si no tiene el movimiento que se salga del for (que ya no cheque más)
+					if (
+						!rook2Movements.some((m) => {
+							return (
+								m.x === rook2.position.x - i &&
+								m.y === rook2.position.y
+							);
+						})
+					) {
+						castle1 = false;
+						break;
+					}
+					if (
+						!isKingOnCheck(
+							pieces,
+							{
+								x: rook2.position.x - i,
+								y: rook2.position.y,
+							},
+							piece,
+							darkOnTop
+						)
+					) {
+						castle2 = false;
+						break;
+					}
+					castle2 = true;
+				}
+				if (castle2) {
+					filteredMovements.push({
+						x: piece.position.x + 2,
+						y: piece.position.y,
+						isCastle: true,
+					});
+				}
+			}
+		}
+
+		// Checar possible movements de las torres entre rey y torre
+
+		// Revisar que no estén atacados los cuadros entre rey y torre
+	}
 
 	if (fromBoard) {
 		const tempKing = pieces.find((p) => {
