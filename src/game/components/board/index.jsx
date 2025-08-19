@@ -1,6 +1,5 @@
 import "./board.css";
 import { useEffect, useState } from "react";
-import { defineInitialPositions } from "../../../constants";
 import {
 	getPawnMovements,
 	getKnightMovements,
@@ -17,6 +16,8 @@ import {
 
 // Generamos tablero
 const Board = ({
+	pieces,
+	setPieces,
 	numbers,
 	capturesTop,
 	setCapturesTop,
@@ -32,6 +33,7 @@ const Board = ({
 	setTurn,
 	history,
 	setHistory,
+	saveGame,
 }) => {
 	const darkOnTop = numbers[0] === "8";
 
@@ -40,7 +42,6 @@ const Board = ({
 		? ["a", "b", "c", "d", "e", "f", "g", "h"]
 		: ["h", "g", "f", "e", "d", "c", "b", "a"];
 
-	const [pieces, setPieces] = useState(defineInitialPositions(numbers));
 	const [possiblePieceMovements, setPossiblePieceMovements] = useState([]);
 	const [selectedPiece, setSelectedPiece] = useState(null);
 
@@ -55,6 +56,8 @@ const Board = ({
 			setLastCoordinates({ x, y });
 		}
 	}, [selectedPiece]);
+
+	// Use Effect de chequeo si hay historial
 
 	const getNewHistory = (piece, movementString) => {
 		var tempHistory = [...history];
@@ -174,11 +177,8 @@ const Board = ({
 					y
 				);
 
-				// TODO:
 				// ----------- ENROQUE -----------
 				// Revisar si se mueve a la derecha son 3 y a la izquierda son 2
-				console.log("isCastle:", isCastle);
-
 				var castleDirection;
 
 				if (isCastle) {
@@ -340,6 +340,7 @@ const Board = ({
 				} else {
 					setTurn("light");
 				}
+				saveGame(tempPieces, newHistory, capturesBottom, capturesTop);
 			}
 			return;
 		}
@@ -486,6 +487,27 @@ const Board = ({
 			} else {
 				setTurn("light");
 			}
+
+			// Fix para renderizar capturas desde configuracion guardada
+			var newCapturesBottom = capturesBottom;
+			newCapturesBottom = darkOnTop
+				? piece.color === "dark"
+					? [...capturesBottom, piece]
+					: capturesBottom
+				: piece.color === "dark"
+				? capturesBottom
+				: [...capturesBottom, piece];
+
+			var newCapturesTop = capturesTop;
+			newCapturesTop = darkOnTop
+				? piece.color === "dark"
+					? capturesTop
+					: [...capturesTop, piece]
+				: piece.color === "dark"
+				? [...capturesTop, piece]
+				: capturesTop;
+
+			saveGame(tempPieces, newHistory, newCapturesBottom, newCapturesTop);
 			return;
 		}
 
@@ -493,6 +515,7 @@ const Board = ({
 		if (piece.color !== turn) {
 			return;
 		}
+
 		setSelectedPiece(piece);
 
 		var possibleMovements = [];

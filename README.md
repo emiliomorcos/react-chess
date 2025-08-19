@@ -23,6 +23,11 @@ Lo que seguiría después sería ahora si con todas los parámetros en la funci�
 
 ### Pasos generales:
 
--   Historial -> **Estamos aquí**
--   LocalStorage (o SessiónStorage)
+-   LocalStorage (o SessiónStorage) **Estamos aquí**
+
+    -   Leer si hay datos guardados (cuando cargue la página de board) -> useEffect
+
+    -   Guardado automático **Ya quedó**
+
+-   Conversión de peones
 -   Implementación de IA
