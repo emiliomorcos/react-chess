@@ -5,14 +5,23 @@ const getPieceMovements = (
 	y,
 	pieces,
 	darkOnTop,
-	fromBoard = false
+	fromBoard = false,
+	lastMovement = ""
 ) => {
 	var possibleMovements = [];
 
 	switch (piece.type) {
 		case "pawn":
 			possibleMovements = fromBoard
-				? getPawnMovements(piece, x, y, darkOnTop, pieces, fromBoard)
+				? getPawnMovements(
+						piece,
+						x,
+						y,
+						darkOnTop,
+						pieces,
+						fromBoard,
+						lastMovement
+				  )
 				: darkOnTop
 				? piece.color === "dark"
 					? [
@@ -149,7 +158,7 @@ const getFriendlyCollisions = (pieces, movement, piece) => {
 	});
 };
 
-// Identficar los posibles movmientos de un rey tomando en cuenta la visión de las piezas enemigas
+// Identficar los posibles movimientos de un rey tomando en cuenta la visión de las piezas enemigas
 const isKingOnCheck = (pieces, movement, piece, darkOnTop) => {
 	const { color: kingColor } = piece;
 	const { x, y } = movement;

@@ -34,6 +34,10 @@ const Board = ({
 	history,
 	setHistory,
 	saveGame,
+	lightKingOnCheck,
+	setLightKingOnCheck,
+	darkKingOnCheck,
+	setDarkKingOnCheck,
 }) => {
 	const darkOnTop = numbers[0] === "8";
 
@@ -45,8 +49,6 @@ const Board = ({
 	const [possiblePieceMovements, setPossiblePieceMovements] = useState([]);
 	const [selectedPiece, setSelectedPiece] = useState(null);
 
-	const [lightKingOnCheck, setLightKingOnCheck] = useState(false);
-	const [darkKingOnCheck, setDarkKingOnCheck] = useState(false);
 	const [lastCoordinates, setLastCoordinates] = useState({});
 
 	useEffect(() => {
@@ -253,6 +255,9 @@ const Board = ({
 					return p.type === "king" && p.color !== selectedPiece.color;
 				});
 
+				var tempLightCheck = false;
+				var tempDarkCheck = false;
+
 				const kingOnCheck = !isKingOnCheck(
 					pieces,
 					tempKing.position,
@@ -263,12 +268,16 @@ const Board = ({
 				if (kingOnCheck) {
 					if (tempKing.color === "light") {
 						setLightKingOnCheck(true);
+						tempLightCheck = true;
 					} else {
 						setDarkKingOnCheck(true);
+						tempDarkCheck = true;
 					}
 				} else {
 					setLightKingOnCheck(false);
 					setDarkKingOnCheck(false);
+					tempLightCheck = false;
+					tempDarkCheck = false;
 				}
 
 				// Revisar si hay jaque mate o stalemate
@@ -289,7 +298,8 @@ const Board = ({
 						friendlyPiece.position.y,
 						tempPieces,
 						darkOnTop,
-						true
+						true,
+						getLastMovement()
 					);
 
 					if (friendlyPieceMovements.length) {
@@ -340,7 +350,14 @@ const Board = ({
 				} else {
 					setTurn("light");
 				}
-				saveGame(tempPieces, newHistory, capturesBottom, capturesTop);
+				saveGame(
+					tempPieces,
+					newHistory,
+					capturesBottom,
+					capturesTop,
+					tempLightCheck,
+					tempDarkCheck
+				);
 			}
 			return;
 		}
@@ -419,12 +436,16 @@ const Board = ({
 			if (kingOnCheck) {
 				if (tempKing.color === "light") {
 					setLightKingOnCheck(true);
+					tempLightCheck = true;
 				} else {
 					setDarkKingOnCheck(true);
+					tempDarkCheck = true;
 				}
 			} else {
 				setLightKingOnCheck(false);
 				setDarkKingOnCheck(false);
+				tempLightCheck = false;
+				tempDarkCheck = false;
 			}
 
 			//Revisar si hay jaque mate o stalemate
@@ -507,7 +528,14 @@ const Board = ({
 				? [...capturesTop, piece]
 				: capturesTop;
 
-			saveGame(tempPieces, newHistory, newCapturesBottom, newCapturesTop);
+			saveGame(
+				tempPieces,
+				newHistory,
+				newCapturesBottom,
+				newCapturesTop,
+				tempLightCheck,
+				tempDarkCheck
+			);
 			return;
 		}
 

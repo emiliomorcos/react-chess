@@ -29,5 +29,10 @@ Lo que seguiría después sería ahora si con todas los parámetros en la funci�
 
     -   Guardado automático **Ya quedó**
 
+    - Borrado automático **Estamos por comenzar aquí**
+    - Checar cuadro rojo de check
+    - Cuando se termine un juego hay que borrar la memoria
+
+
 -   Conversión de peones
 -   Implementación de IA

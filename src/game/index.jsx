@@ -26,9 +26,9 @@ const Game = () => {
 
 	const [capturesTop, setCapturesTop] = useState([]);
 	const [capturesBottom, setCapturesBottom] = useState([]);
-	const [pieces, setPieces] = useState(
-		defineInitialPositions(defineNumbers(gameType))
-	);
+	const [pieces, setPieces] = useState([]);
+	const [lightKingOnCheck, setLightKingOnCheck] = useState(false);
+	const [darkKingOnCheck, setDarkKingOnCheck] = useState(false);
 
 	const [turn, setTurn] = useState("light");
 
@@ -48,7 +48,9 @@ const Game = () => {
 		pieces,
 		newHistory,
 		newCapturesBottom,
-		newCapturesTop
+		newCapturesTop,
+		lightKingOnCheck,
+		darkKingOnCheck
 	) => {
 		console.log("Guardando partida...");
 		// Aquí se guardaria el estado del juego en localStorage
@@ -66,6 +68,8 @@ const Game = () => {
 			difficulty: difficulty,
 			turn: turn === "light" ? "dark" : "light",
 			isNew: false,
+			lightKingOnCheck: lightKingOnCheck,
+			darkKingOnCheck: darkKingOnCheck,
 		};
 
 		localStorage.setItem(gameType, JSON.stringify(gameConfiguration));
@@ -81,13 +85,8 @@ const Game = () => {
 		setCapturesBottom(actualConfiguration.capturesBottom);
 		setTurn(actualConfiguration.turn);
 		setPieces(actualConfiguration.pieces);
-
-		// Reinicio TEMPORAL
-		// setHistory([]);
-		// setCapturesTop([]);
-		// setCapturesBottom([]);
-		// setTurn("light");
-		// setPieces(defineInitialPositions(defineNumbers(gameType)));
+		setLightKingOnCheck(actualConfiguration.lightKingOnCheck);
+		setDarkKingOnCheck(actualConfiguration.darkKingOnCheck);
 	}, []);
 
 	return (
@@ -170,6 +169,10 @@ const Game = () => {
 					history={history}
 					setHistory={setHistory}
 					saveGame={saveGame}
+					lightKingOnCheck={lightKingOnCheck}
+					setLightKingOnCheck={setLightKingOnCheck}
+					darkKingOnCheck={darkKingOnCheck}
+					setDarkKingOnCheck={setDarkKingOnCheck}
 				/>
 				<div className="history">
 					<div>
@@ -270,3 +273,4 @@ const Game = () => {
 };
 
 export default Game;
+export { defineNumbers };

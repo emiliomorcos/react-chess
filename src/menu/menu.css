@@ -29,3 +29,8 @@
 .play-button {
 	margin-top: 1.5rem;
 }
+
+.play-btns {
+	display: flex;
+	justify-content: space-around;
+}

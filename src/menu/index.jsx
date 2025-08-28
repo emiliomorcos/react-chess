@@ -1,7 +1,9 @@
 import React from "react";
 import { Button, message } from "antd";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { defineNumbers } from "../game";
+import { defineInitialPositions } from "../constants";
 import "./menu.css";
 
 //TODO: Agregar jugar al dar click a Enter
@@ -11,28 +13,79 @@ const Menu = () => {
 	const [player1, setPlayer1] = useState("");
 	const [player2, setPlayer2] = useState("");
 	const [color, setColor] = useState("white");
+	const [configuration, setConfiguration] = useState({});
+
+	useEffect(() => {
+		const tempConfiguration = JSON.parse(
+			localStorage.getItem(`${gameType}_${color}`)
+		);
+		console.log("tempConfiguration", tempConfiguration);
+
+		setConfiguration(tempConfiguration);
+	}, [gameType, color]);
+
 	const navigate = useNavigate();
 	const [messageApi, contextHolder] = message.useMessage();
 
-	const handlePlay = () => {
-		if (gameType === "two-players" && (!player1 || !player2)) {
+	const newGame = () => {
+		const newConfiguration = {
+			pieces: defineInitialPositions(
+				defineNumbers(`${gameType}_${color}`)
+			),
+			history: [],
+			player1: player1,
+			player2: player2,
+			capturesTop: [],
+			capturesBottom: [],
+			gametype: gameType,
+			difficulty: difficulty,
+			turn: "light",
+			isNew: true,
+			lightKingOnCheck: false,
+			darkKingOnCheck: false,
+		};
+
+		localStorage.setItem(
+			`${gameType}_${color}`,
+			JSON.stringify(newConfiguration)
+		);
+
+		navigate(
+			`/game/${gameType}_${color}/${player1}/${
+				gameType === "two-players" ? player2 : "default"
+			}/${gameType === "two-players" ? "default" : difficulty}`
+		);
+	};
+
+	const handlePlay = (isNewGame) => {
+		if (gameType === "two-players" && (!player1 || !player2) && isNewGame) {
 			messageApi.open({
 				type: "error",
 				content: "Por favor ingresa el nombre de ambos jugadores",
 			});
 			return;
-		} else if (gameType === "ai" && !player1) {
+		} else if (gameType === "ai" && !player1 && isNewGame) {
 			messageApi.open({
 				type: "error",
 				content: "Por favor ingresa el nombre del jugador",
 			});
 			return;
 		} else {
-			navigate(
-				`/game/${gameType}_${color}/${player1}/${
-					gameType === "two-players" ? player2 : "default"
-				}/${gameType === "two-players" ? "default" : difficulty}`
-			);
+			if (isNewGame) {
+				newGame();
+			} else {
+				navigate(
+					`/game/${gameType}_${color}/${configuration.player1}/${
+						gameType === "two-players"
+							? configuration.player2
+							: "default"
+					}/${
+						gameType === "two-players"
+							? "default"
+							: configuration.difficulty
+					}`
+				);
+			}
 		}
 	};
 
@@ -46,7 +99,9 @@ const Menu = () => {
 						type={
 							gameType === "two-players" ? "primary" : "default"
 						}
-						onClick={() => setGameType("two-players")}
+						onClick={() => {
+							setGameType("two-players"), setColor("white");
+						}}
 					>
 						2 jugadores
 					</Button>
@@ -129,9 +184,29 @@ const Menu = () => {
 						</div>
 					</>
 				)}
-				<Button className="play-button" onClick={handlePlay}>
-					Jugar!
-				</Button>
+				{configuration.isNew ? (
+					<Button
+						className="play-button"
+						onClick={() => handlePlay(true)}
+					>
+						Jugar!
+					</Button>
+				) : (
+					<div className="play-btns">
+						<Button
+							className="play-button"
+							onClick={() => handlePlay(false)}
+						>
+							Continuar juego
+						</Button>
+						<Button
+							className="play-button"
+							onClick={() => handlePlay(true)}
+						>
+							Nuevo juego
+						</Button>
+					</div>
+				)}
 			</div>
 		</div>
 	);
