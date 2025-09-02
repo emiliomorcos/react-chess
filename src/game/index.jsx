@@ -50,7 +50,10 @@ const Game = () => {
 		newCapturesBottom,
 		newCapturesTop,
 		lightKingOnCheck,
-		darkKingOnCheck
+		darkKingOnCheck,
+		tempCheckmate,
+		tempStalemate,
+		winner
 	) => {
 		console.log("Guardando partida...");
 		// Aquí se guardaria el estado del juego en localStorage
@@ -70,6 +73,9 @@ const Game = () => {
 			isNew: false,
 			lightKingOnCheck: lightKingOnCheck,
 			darkKingOnCheck: darkKingOnCheck,
+			checkmate: tempCheckmate,
+			stalemate: tempStalemate,
+			winner: winner,
 		};
 
 		localStorage.setItem(gameType, JSON.stringify(gameConfiguration));
@@ -87,6 +93,9 @@ const Game = () => {
 		setPieces(actualConfiguration.pieces);
 		setLightKingOnCheck(actualConfiguration.lightKingOnCheck);
 		setDarkKingOnCheck(actualConfiguration.darkKingOnCheck);
+		setCheckmate(actualConfiguration.checkmate);
+		setStalemate(actualConfiguration.stalemate);
+		setWinner(actualConfiguration.winner);
 	}, []);
 
 	return (

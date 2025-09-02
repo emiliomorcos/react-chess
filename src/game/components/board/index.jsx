@@ -332,15 +332,23 @@ const Board = ({
 				const newHistory = getNewHistory(selectedPiece, movementString);
 				setHistory(newHistory);
 
+				var tempCheckmate = false;
+				var tempStalemate = false;
+				var tempWinner = "";
+
 				if (noMovesLeft) {
 					setTurn("");
 					if (kingOnCheck) {
 						setCheckmate(true);
+						tempCheckmate = true;
 						setWinner(
 							tempKing.color === "light" ? "dark" : "light"
 						);
+						tempWinner =
+							tempKing.color === "light" ? "dark" : "light";
 					} else {
 						setStalemate(true);
+						tempStalemate = true;
 					}
 				}
 
@@ -356,7 +364,10 @@ const Board = ({
 					capturesBottom,
 					capturesTop,
 					tempLightCheck,
-					tempDarkCheck
+					tempDarkCheck,
+					tempCheckmate,
+					tempStalemate,
+					tempWinner
 				);
 			}
 			return;
@@ -492,13 +503,20 @@ const Board = ({
 				}
 			}
 
+			var tempCheckmate = false;
+			var tempStalemate = false;
+			var tempWinner = "";
+
 			if (noMovesLeft) {
 				setTurn("");
 				if (kingOnCheck) {
 					setCheckmate(true);
+					tempCheckmate = true;
 					setWinner(tempKing.color === "light" ? "dark" : "light");
+					tempWinner = tempKing.color === "light" ? "dark" : "light";
 				} else {
 					setStalemate(true);
+					tempStalemate = true;
 				}
 			}
 
@@ -534,7 +552,10 @@ const Board = ({
 				newCapturesBottom,
 				newCapturesTop,
 				tempLightCheck,
-				tempDarkCheck
+				tempDarkCheck,
+				tempCheckmate,
+				tempStalemate,
+				tempWinner
 			);
 			return;
 		}

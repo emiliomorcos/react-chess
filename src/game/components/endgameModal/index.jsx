@@ -1,7 +1,10 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "./endgameModal.css";
 
 const EndgameModal = ({ checkmate, winner, numbers, player1, player2 }) => {
+	const navigate = useNavigate();
+
 	const darkOnTop = numbers[0] === "8";
 	const winnerPlayer = darkOnTop
 		? winner === "dark"
@@ -18,6 +21,7 @@ const EndgameModal = ({ checkmate, winner, numbers, player1, player2 }) => {
 					? `El jugador ${winnerPlayer} ha ganado la partida!`
 					: "Los jugadores han empatado"}
 			</p>
+			<button onClick={() => {}}>Regresar a menú</button>
 		</div>
 	);
 };
