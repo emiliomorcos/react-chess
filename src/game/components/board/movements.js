@@ -913,7 +913,8 @@ const getMovementString = (
 	isKingOnCheck,
 	isCommon,
 	lastCoordinates,
-	darkOnTop
+	darkOnTop,
+	conversionType = ""
 ) => {
 	const xvalues = {
 		0: "a",
@@ -983,6 +984,10 @@ const getMovementString = (
 		}
 		// Comparar lasCoordinates y coordenadas de commonPiece
 		// Si la x es igual usamos la y (num), s la y es igual usamos la x (letra), si ninguno es igual usamos la x (letra)
+	}
+
+	if (conversionType) {
+		movementString += `=${typeLetter[conversionType]}`;
 	}
 	return movementString;
 };

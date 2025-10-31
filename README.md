@@ -33,5 +33,10 @@ Lo que seguiría después sería ahora si con todas los parámetros en la funci�
     -   Checar cuadro rojo de check
     -   Cuando se termine un juego hay que borrar la memoria
 
--   Conversión de peones **Estamos por comenzar aquí**
+-   Conversión de peones
+
+    -   Al dar click en el posible movimiento o take que se abra un modal con las opciones de piezas (4)
+    -   No queremos ejecutar el movimiento hasta dar click en la pieza, queremos que se pueda cerrar el modal en caso de arrepentirse, y si se cierra que siga el turno normal.
+    -   Considerar generación de string
+
 -   Implementación de IA

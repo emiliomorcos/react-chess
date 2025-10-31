@@ -5,6 +5,7 @@
 }
 
 .board {
+	position: relative;
 	display: grid;
 	grid-template-columns: repeat(8, var(--square-size));
 	grid-template-rows: repeat(8, var(--square-size));
@@ -31,6 +32,14 @@
 	height: calc(var(--square-size) * 0.3);
 	border-radius: 50%;
 	background-color: rgba(0, 0, 0, 0.2);
+}
+
+.take-icon {
+	position: absolute;
+	width: calc(var(--square-size) * 0.9);
+	height: calc(var(--square-size) * 0.9);
+	border-radius: 50%;
+	border: 5px solid rgba(0, 0, 0, 0.2);
 }
 
 .square.selected-piece {

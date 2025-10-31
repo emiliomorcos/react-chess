@@ -1,0 +1,60 @@
+:root {
+	--square-size: calc(80vh / 8);
+}
+
+.pawn-modal {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-around;
+	background-color: rgb(226, 224, 224);
+	color: rgb(226, 224, 224);
+	position: absolute;
+	width: var(--square-size);
+	height: calc(var(--square-size) * 4);
+}
+
+.squareModal {
+	width: calc(var(--square-size) * 0.95);
+	height: calc(var(--square-size) * 0.95);
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+.squareModal:hover {
+	cursor: pointer;
+	background-color: brown;
+	color: brown;
+}
+
+.light-queen {
+	background-image: url(/public/ql.png);
+}
+
+.dark-queen {
+	background-image: url(/public/qd.png);
+}
+
+.light-rook {
+	background-image: url(/public/rl.png);
+}
+
+.dark-rook {
+	background-image: url(/public/rd.png);
+}
+
+.light-bishop {
+	background-image: url(/public/bl.png);
+}
+
+.dark-bishop {
+	background-image: url(/public/bd.png);
+}
+
+.light-knight {
+	background-image: url(/public/nl.png);
+}
+
+.dark-knight {
+	background-image: url(/public/nd.png);
+}

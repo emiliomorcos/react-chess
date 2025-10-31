@@ -24,6 +24,32 @@ const Menu = () => {
 		setConfiguration(tempConfiguration);
 	}, [gameType, color]);
 
+	// useEffect(() => {
+	// 	const getJoke = async () => {
+	// 		try {
+	// 			const response = await api.get("/joke/Programming");
+	// 			console.log("Joke response:", response.data);
+	// 		} catch (error) {
+	// 			console.error("error fetching joke:", error);
+	// 		}
+	// 	};
+	// 	getJoke();
+	// }, []);
+
+	// Llamada de chiste de prueba
+	// useEffect(() => {
+	// 	const getJoke = async () => {
+	// 		try {
+	// 			const res = await fetch("https://v2.jokeapi.dev/joke/Any");
+	// 			console.log("res", await res.json());
+	// 		} catch (error) {
+	// 			console.error("Error fetching joke:", error);
+	// 		}
+	// 	};
+
+	// 	getJoke();
+	// }, []);
+
 	const navigate = useNavigate();
 	const [messageApi, contextHolder] = message.useMessage();
 
@@ -187,7 +213,7 @@ const Menu = () => {
 						</div>
 					</>
 				)}
-				{configuration.isNew ? (
+				{!configuration || configuration.isNew ? (
 					<Button
 						className="play-button"
 						onClick={() => handlePlay(true)}

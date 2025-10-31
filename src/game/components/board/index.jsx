@@ -13,6 +13,7 @@ import {
 	getMovementsInCommon,
 	getMovementString,
 } from "./movements";
+import PawnModal from "../pawnModal";
 
 // Generamos tablero
 const Board = ({
@@ -46,6 +47,11 @@ const Board = ({
 		? ["a", "b", "c", "d", "e", "f", "g", "h"]
 		: ["h", "g", "f", "e", "d", "c", "b", "a"];
 
+	const [openPawnModal, setOpenPawnModal] = useState({
+		open: false,
+		coords: {},
+		type: "",
+	});
 	const [possiblePieceMovements, setPossiblePieceMovements] = useState([]);
 	const [selectedPiece, setSelectedPiece] = useState(null);
 
@@ -58,6 +64,210 @@ const Board = ({
 			setLastCoordinates({ x, y });
 		}
 	}, [selectedPiece]);
+
+	const getImage = (type, color) => {
+		var imageString = "";
+		switch (type) {
+			case "queen":
+				imageString = `q${color.charAt(0)}.png`;
+				break;
+
+			case "rook":
+				imageString = `r${color.charAt(0)}.png`;
+				break;
+
+			case "bishop":
+				imageString = `b${color.charAt(0)}.png`;
+				break;
+
+			case "knight":
+				imageString = `n${color.charAt(0)}.png`;
+				break;
+
+			default:
+				imageString = `p${color.charAt(0)}.png`;
+				break;
+		}
+
+		return imageString;
+	};
+
+	const convertPawn = (pieceType) => {
+		var tempPieces;
+		console.log("convertPawn to", pieceType);
+		if (openPawnModal.type === "move") {
+			tempPieces = movePieceOnTake(
+				[...pieces],
+				selectedPiece,
+				openPawnModal.coords.x,
+				openPawnModal.coords.y
+			);
+		} else {
+			const piece = pieces.find((p) => {
+				return (
+					p.position.x === openPawnModal.coords.x &&
+					p.position.y === openPawnModal.coords.y
+				);
+			});
+			tempPieces = [...pieces];
+			const tempPieceIndex = tempPieces.indexOf(piece);
+			tempPieces.splice(tempPieceIndex, 1);
+			tempPieces = movePieceOnTake(
+				tempPieces,
+				selectedPiece,
+				openPawnModal.coords.x,
+				openPawnModal.coords.y
+			);
+
+			if (darkOnTop) {
+				piece.color === "dark"
+					? setCapturesBottom([...capturesBottom, piece])
+					: setCapturesTop([...capturesTop, piece]);
+			} else {
+				piece.color === "dark"
+					? setCapturesTop([...capturesTop, piece])
+					: setCapturesBottom([...capturesBottom, piece]);
+			}
+		}
+
+		// Cambiamos el peon a la otra pieza
+		const pieceToChange = tempPieces.find((p) => {
+			return p.name === selectedPiece.name;
+		});
+
+		const pieceToChangeIndex = tempPieces.indexOf(pieceToChange);
+
+		// Manera manual de asignar
+		// tempPieces[pieceToChangeIndex].name = "..."
+		// tempPieces[pieceToChangeIndex].type = "..."
+		// tempPieces[pieceToChangeIndex].image = "/..."
+
+		var nameNum = 0;
+
+		pieces.forEach((p) => {
+			if (p.type === pieceType && p.color === selectedPiece.color)
+				nameNum++;
+		});
+
+		tempPieces[pieceToChangeIndex] = {
+			...pieceToChange,
+			name: `${selectedPiece.color}${pieceType
+				.charAt(0)
+				.toUpperCase()}${pieceType.slice(1)}${nameNum + 1}`,
+			type: pieceType,
+			image: getImage(pieceType, selectedPiece.color),
+		};
+
+		setPieces(tempPieces);
+		setPossiblePieceMovements([]);
+		const tempKing = pieces.find((p) => {
+			return p.type === "king" && p.color !== selectedPiece.color;
+		});
+
+		var tempLightCheck = false;
+		var tempDarkCheck = false;
+
+		const kingOnCheck = !isKingOnCheck(
+			tempPieces,
+			tempKing.position,
+			tempKing,
+			darkOnTop
+		);
+		if (kingOnCheck) {
+			if (tempKing.color === "light") {
+				setLightKingOnCheck(true);
+				console.log("light king on check true");
+				tempLightCheck = true;
+			} else {
+				setDarkKingOnCheck(true);
+				console.log("dark king on check true");
+				tempDarkCheck = true;
+			}
+		} else {
+			setLightKingOnCheck(false);
+			setDarkKingOnCheck(false);
+			tempLightCheck = false;
+			tempDarkCheck = false;
+		}
+
+		const movementString = getMovementString(
+			selectedPiece,
+			pieces,
+			openPawnModal.coords.x,
+			openPawnModal.coords.y,
+			openPawnModal.type === "take",
+			kingOnCheck,
+			false,
+			lastCoordinates,
+			darkOnTop,
+			pieceType
+		);
+
+		const newHistory = getNewHistory(selectedPiece, movementString);
+		setHistory(newHistory);
+
+		const friendlyPieces = tempPieces.filter(
+			(p) => p.color === tempKing.color
+		);
+
+		var noMovesLeft = true;
+
+		for (let i = 0; i < friendlyPieces.length; i++) {
+			var friendlyPiece = friendlyPieces[i];
+
+			const friendlyPieceMovements = getPieceMovements(
+				friendlyPiece,
+				friendlyPiece.position.x,
+				friendlyPiece.position.y,
+				tempPieces,
+				darkOnTop,
+				true,
+				getLastMovement()
+			);
+
+			if (friendlyPieceMovements.length) {
+				noMovesLeft = false;
+				break;
+			}
+		}
+
+		var tempCheckmate = false;
+		var tempStalemate = false;
+		var tempWinner = "";
+
+		if (noMovesLeft) {
+			if (kingOnCheck) {
+				setCheckmate(true);
+				tempCheckmate = true;
+				setWinner(tempKing.color === "light" ? "dark" : "light");
+				tempWinner = tempKing.color === "light" ? "dark" : "light";
+			} else {
+				setStalemate(true);
+				tempStalemate = true;
+			}
+			setTurn("");
+		}
+
+		setSelectedPiece(null);
+		if (turn === "light") {
+			setTurn("dark");
+		} else {
+			setTurn("light");
+		}
+
+		saveGame(
+			tempPieces,
+			newHistory,
+			capturesBottom,
+			capturesTop,
+			tempLightCheck,
+			tempDarkCheck,
+			tempCheckmate,
+			tempStalemate,
+			tempWinner
+		);
+		setOpenPawnModal({ open: false, coords: {}, type: "" });
+	};
 
 	// Use Effect de chequeo si hay historial
 
@@ -122,6 +332,7 @@ const Board = ({
 
 		return classname;
 	};
+
 	// Definimos función para manejar el click de una pieza
 	const handlePieceClick = (
 		x,
@@ -135,10 +346,22 @@ const Board = ({
 			return;
 		}
 
+		setOpenPawnModal({ open: false, coords: {}, type: "" });
+
 		if (!hasPiece) {
 			// -------------------- POSSIBLE MOVEMENT --------------------
 			if (isPossibleMovement) {
 				var pieceCommonMovements = [];
+
+				// Conversión de peones
+				if (selectedPiece.type === "pawn" && (y === 0 || y === 7)) {
+					setOpenPawnModal({
+						open: true,
+						coords: { x, y },
+						type: "move",
+					});
+					return;
+				}
 
 				if (
 					selectedPiece.type === "knight" ||
@@ -337,7 +560,6 @@ const Board = ({
 				var tempWinner = "";
 
 				if (noMovesLeft) {
-					setTurn("");
 					if (kingOnCheck) {
 						setCheckmate(true);
 						tempCheckmate = true;
@@ -350,6 +572,7 @@ const Board = ({
 						setStalemate(true);
 						tempStalemate = true;
 					}
+					setTurn("");
 				}
 
 				setSelectedPiece(null);
@@ -381,6 +604,16 @@ const Board = ({
 		//  Checar si el square con pieza es un possible movement && isTake === true
 		if (isPossibleTake) {
 			var pieceCommonMovements = [];
+
+			// Conversion de peones
+			if (selectedPiece.type === "pawn" && (y === 0 || y === 7)) {
+				setOpenPawnModal({
+					open: true,
+					coords: { x, y },
+					type: "take",
+				});
+				return;
+			}
 
 			if (
 				selectedPiece.type === "knight" ||
@@ -425,6 +658,7 @@ const Board = ({
 			}
 
 			var tempPieces = [...pieces];
+
 			const tempPieceIndex = tempPieces.indexOf(piece);
 			tempPieces.splice(tempPieceIndex, 1);
 			tempPieces = movePieceOnTake(tempPieces, selectedPiece, x, y);
@@ -706,12 +940,27 @@ const Board = ({
 								);
 							})}
 							{isPossibleMovement && (
-								<div className="movement-icon"></div>
+								<div
+									className={
+										isPossibleTake
+											? "take-icon"
+											: "movement-icon"
+									}
+								></div>
 							)}
 						</div>
 					);
 				});
 			})}
+			{openPawnModal.open && (
+				<PawnModal
+					color={selectedPiece.color}
+					x={selectedPiece.position.x}
+					y={selectedPiece.position.y}
+					selectedX={openPawnModal.coords}
+					convertPawn={convertPawn}
+				/>
+			)}
 		</div>
 	);
 };
