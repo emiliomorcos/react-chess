@@ -262,6 +262,7 @@ const getPawnMovements = (
 	fromBoard = false,
 	lastMovement
 ) => {
+	console.log("Entramos a getPawnMovements");
 	var possibleMovements = [];
 
 	possibleMovements = darkOnTop
@@ -271,6 +272,8 @@ const getPawnMovements = (
 		: piece.color === "dark"
 		? [{ x, y: y - 1 }]
 		: [{ x, y: y + 1 }];
+
+	console.log("possibleMovements primera iteración", possibleMovements);
 
 	// Usamos getPossibleTakes para ver si hay una pieza enemiga enfrente y quitar el movimiento
 	if (getPossibleTakes(pieces, possibleMovements[0], piece)) {
@@ -291,6 +294,7 @@ const getPawnMovements = (
 				? { x, y: y - 2 }
 				: { x, y: y + 2 }
 		);
+		console.log("possibleMovements segunda iteración", possibleMovements);
 
 		if (
 			getPossibleTakes(
@@ -1026,6 +1030,111 @@ const getMovementsInCommon = (
 	return commonMovements;
 };
 
+const validateMovement = (pieces, piece, movement, darkOnTop, lastMovement) => {
+	const xvalues = {
+		a: 7,
+		b: 6,
+		c: 5,
+		d: 4,
+		e: 3,
+		f: 2,
+		g: 1,
+		h: 0,
+	};
+
+	const darkxvalues = {
+		a: 0,
+		b: 1,
+		c: 2,
+		d: 3,
+		e: 4,
+		f: 5,
+		g: 6,
+		h: 7,
+	};
+
+	const pieceX = piece[0];
+	const pieceY = parseInt(piece[1]);
+	const pieceCoords = {
+		x: darkOnTop ? darkxvalues[pieceX] : xvalues[pieceX],
+		y: darkOnTop ? 8 - pieceY : pieceY - 1,
+	};
+
+	console.log("pieceCoords", pieceCoords);
+
+	// Sacamos el movement string limpio para convertirlo a coordenadas
+	const cleanMovement = ["N", "R", "B", "Q", "K", "x", "+", "#"];
+
+	// Quitamos caracteres innecesarios
+	let i = 0;
+	while (movement.length > 2) {
+		movement = movement.replace(cleanMovement[i], "");
+		i++;
+
+		if (i > cleanMovement.length - 1) {
+			movement = movement.slice(1);
+		}
+	}
+	console.log("cleaned movement", movement);
+
+	// Convertirmos a coordenadas
+	const movementX = movement[0];
+	const movementY = parseInt(movement[1]);
+	const movementCoords = {
+		x: darkOnTop ? darkxvalues[movementX] : xvalues[movementX],
+		y: darkOnTop ? 8 - movementY : movementY - 1,
+	};
+
+	console.log("movement coords", movementCoords);
+
+	// Revisamos si el movimiento está en possible movements de la pieza a mover
+	const selectedPiece = pieces.find((p) => {
+		return p.position.x === pieceCoords.x && p.position.y === pieceCoords.y;
+	});
+
+	console.log("selectedPiece", selectedPiece);
+
+	const possibleMovements =
+		selectedPiece.type === "pawn"
+			? getPawnMovements(
+					selectedPiece,
+					pieceCoords.x,
+					pieceCoords.y,
+					darkOnTop,
+					pieces,
+					false,
+					lastMovement
+			  )
+			: getPieceMovements(
+					selectedPiece,
+					pieceCoords.x,
+					pieceCoords.y,
+					pieces,
+					darkOnTop,
+					false,
+					lastMovement
+			  );
+
+	console.log("possibleMovements", possibleMovements);
+
+	// Validar que el movimiento sea posible con coordenadas y extraerlo con el find
+	const checkMovement = possibleMovements.find((pm) => {
+		return pm.x === movementCoords.x && pm.y === movementCoords.y;
+	});
+
+	isValid = checkMovement ? true : false;
+
+	return {
+		isValid,
+		piece: selectedPiece,
+		movement: movementCoords,
+		isTake: checkMovement?.isTake ? true : false,
+	};
+
+	// Estructura del return
+	// {isValid: bool, piece: coords, movement: coord, isTake:bool}
+};
+
 export {
 	getPawnMovements,
 	getKnightMovements,
@@ -1038,4 +1147,5 @@ export {
 	getPieceMovements,
 	getMovementString,
 	getMovementsInCommon,
+	validateMovement,
 };

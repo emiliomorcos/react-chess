@@ -9,7 +9,7 @@ import "./menu.css";
 //TODO: Agregar jugar al dar click a Enter
 const Menu = () => {
 	const [gameType, setGameType] = useState("two-players");
-	const [difficulty, setDifficulty] = useState("facil");
+	const [difficulty, setDifficulty] = useState("easy");
 	const [player1, setPlayer1] = useState("");
 	const [player2, setPlayer2] = useState("");
 	const [color, setColor] = useState("white");
@@ -166,31 +166,31 @@ const Menu = () => {
 						<div className="buttons">
 							<Button
 								type={
-									difficulty === "facil"
+									difficulty === "easy"
 										? "primary"
 										: "default"
 								}
-								onClick={() => setDifficulty("facil")}
+								onClick={() => setDifficulty("easy")}
 							>
 								Fácil
 							</Button>
 							<Button
 								type={
-									difficulty === "medio"
+									difficulty === "medium"
 										? "primary"
 										: "default"
 								}
-								onClick={() => setDifficulty("medio")}
+								onClick={() => setDifficulty("medium")}
 							>
 								Medio
 							</Button>
 							<Button
 								type={
-									difficulty === "dificil"
+									difficulty === "hard"
 										? "primary"
 										: "default"
 								}
-								onClick={() => setDifficulty("dificil")}
+								onClick={() => setDifficulty("hard")}
 							>
 								Difícil
 							</Button>

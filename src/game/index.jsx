@@ -42,6 +42,8 @@ const Game = () => {
 
 	const color = gameType.split("_")[1];
 
+	const gameTypeName = gameType.split("_")[0];
+
 	const darkOnTop = numbers[0] === "8";
 
 	const saveGame = (
@@ -83,6 +85,15 @@ const Game = () => {
 
 	useEffect(() => {
 		const actualConfiguration = JSON.parse(localStorage.getItem(gameType));
+
+		if (
+			actualConfiguration.gameType === "ai" &&
+			actualConfiguration.isNew === true &&
+			color === "black"
+		) {
+			// Empieza el juego la IA
+			console.log("empieza la IA");
+		}
 
 		console.log("Cargando partida...", actualConfiguration);
 		// Asignar todo a como está en la configuración guardada
@@ -182,6 +193,9 @@ const Game = () => {
 					setLightKingOnCheck={setLightKingOnCheck}
 					darkKingOnCheck={darkKingOnCheck}
 					setDarkKingOnCheck={setDarkKingOnCheck}
+					gameTypeName={gameTypeName}
+					color={color === "white" ? "light" : "dark"}
+					difficulty={difficulty}
 				/>
 				<div className="history">
 					<div>

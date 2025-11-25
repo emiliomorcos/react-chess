@@ -12,7 +12,9 @@ import {
 	getPieceMovements,
 	getMovementsInCommon,
 	getMovementString,
+	validateMovement,
 } from "./movements";
+import { createMovement } from "../../../openai";
 import PawnModal from "../pawnModal";
 
 // Generamos tablero
@@ -39,6 +41,9 @@ const Board = ({
 	setLightKingOnCheck,
 	darkKingOnCheck,
 	setDarkKingOnCheck,
+	gameTypeName,
+	color,
+	difficulty,
 }) => {
 	const darkOnTop = numbers[0] === "8";
 
@@ -334,7 +339,7 @@ const Board = ({
 	};
 
 	// Definimos función para manejar el click de una pieza
-	const handlePieceClick = (
+	const handlePieceClick = async (
 		x,
 		y,
 		hasPiece,
@@ -343,6 +348,10 @@ const Board = ({
 		isCastle
 	) => {
 		if (checkmate || stalemate) {
+			return;
+		}
+
+		if (gameTypeName === "ai" && turn !== color) {
 			return;
 		}
 
@@ -581,6 +590,7 @@ const Board = ({
 				} else {
 					setTurn("light");
 				}
+				// Possible movement
 				saveGame(
 					tempPieces,
 					newHistory,
@@ -592,6 +602,36 @@ const Board = ({
 					tempStalemate,
 					tempWinner
 				);
+
+				// DO WHILE para ejecutar una vez el código y si isValid sigue siendo false ciclar en el while hasta que regrese true
+
+				let isValid = false;
+				let regenerate = false;
+				let lastGeneratedMovement;
+
+				do {
+					const newMovement = await createMovement(
+						difficulty,
+						newHistory,
+						color === "light" ? "dark" : "light",
+						regenerate,
+						lastGeneratedMovement
+					);
+
+					const validation = validateMovement(
+						pieces,
+						newMovement.pieza,
+						newMovement.movimiento,
+						darkOnTop,
+						getLastMovement()
+					);
+
+					isValid = validation.isValid;
+					regenerate = true;
+					lastGeneratedMovement = newMovement;
+				} while (!isValid);
+
+				console.log("Movimiento IA:", newMovement);
 			}
 			return;
 		}
@@ -780,6 +820,7 @@ const Board = ({
 				? [...capturesTop, piece]
 				: capturesTop;
 
+			// Possible take
 			saveGame(
 				tempPieces,
 				newHistory,
