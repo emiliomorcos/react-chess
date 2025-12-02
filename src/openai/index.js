@@ -1,12 +1,14 @@
 import axios from "axios";
-import { system_prompts } from "./prompts";
+import { system_prompts } from "./prompts.js";
+
+const openAIApiKey = import.meta.VITE_OPENAI_API_KEY;
 
 // Instancia de axios
 const api = axios.create({
 	baseURL: "https://api.openai.com/v1",
 	timeout: 50000,
 	headers: {
-		Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
+		Authorization: `Bearer ${openAIApiKey}`,
 	},
 });
 

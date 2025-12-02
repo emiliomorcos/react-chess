@@ -1102,7 +1102,7 @@ const validateMovement = (pieces, piece, movement, darkOnTop, lastMovement) => {
 					pieceCoords.y,
 					darkOnTop,
 					pieces,
-					false,
+					true,
 					lastMovement
 			  )
 			: getPieceMovements(
@@ -1111,7 +1111,7 @@ const validateMovement = (pieces, piece, movement, darkOnTop, lastMovement) => {
 					pieceCoords.y,
 					pieces,
 					darkOnTop,
-					false,
+					true,
 					lastMovement
 			  );
 
@@ -1122,7 +1122,7 @@ const validateMovement = (pieces, piece, movement, darkOnTop, lastMovement) => {
 		return pm.x === movementCoords.x && pm.y === movementCoords.y;
 	});
 
-	isValid = checkMovement ? true : false;
+	const isValid = checkMovement ? true : false;
 
 	return {
 		isValid,
