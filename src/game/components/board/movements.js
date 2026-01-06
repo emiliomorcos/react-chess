@@ -262,7 +262,6 @@ const getPawnMovements = (
 	fromBoard = false,
 	lastMovement
 ) => {
-	console.log("Entramos a getPawnMovements");
 	var possibleMovements = [];
 
 	possibleMovements = darkOnTop
@@ -272,8 +271,6 @@ const getPawnMovements = (
 		: piece.color === "dark"
 		? [{ x, y: y - 1 }]
 		: [{ x, y: y + 1 }];
-
-	console.log("possibleMovements primera iteración", possibleMovements);
 
 	// Usamos getPossibleTakes para ver si hay una pieza enemiga enfrente y quitar el movimiento
 	if (getPossibleTakes(pieces, possibleMovements[0], piece)) {
@@ -294,7 +291,6 @@ const getPawnMovements = (
 				? { x, y: y - 2 }
 				: { x, y: y + 2 }
 		);
-		console.log("possibleMovements segunda iteración", possibleMovements);
 
 		if (
 			getPossibleTakes(
@@ -1031,6 +1027,8 @@ const getMovementsInCommon = (
 };
 
 const validateMovement = (pieces, piece, movement, darkOnTop, lastMovement) => {
+	// TODO: MANEJAR ENROQUE, PROMOCIÓN DE PEONES Y EN PASSANT
+
 	const xvalues = {
 		a: 7,
 		b: 6,
@@ -1060,22 +1058,27 @@ const validateMovement = (pieces, piece, movement, darkOnTop, lastMovement) => {
 		y: darkOnTop ? 8 - pieceY : pieceY - 1,
 	};
 
-	console.log("pieceCoords", pieceCoords);
+	let conversionType;
+
+	// Revisamos si es conversión de peón
+	if (movement.includes("=")) {
+		conversionType = movement.split("=")[1][0];
+	}
 
 	// Sacamos el movement string limpio para convertirlo a coordenadas
-	const cleanMovement = ["N", "R", "B", "Q", "K", "x", "+", "#"];
+	const cleanMovement = ["N", "R", "B", "Q", "K", "x", "+", "#", "="];
 
 	// Quitamos caracteres innecesarios
 	let i = 0;
 	while (movement.length > 2) {
 		movement = movement.replace(cleanMovement[i], "");
-		i++;
 
 		if (i > cleanMovement.length - 1) {
 			movement = movement.slice(1);
 		}
+
+		i++;
 	}
-	console.log("cleaned movement", movement);
 
 	// Convertirmos a coordenadas
 	const movementX = movement[0];
@@ -1085,14 +1088,10 @@ const validateMovement = (pieces, piece, movement, darkOnTop, lastMovement) => {
 		y: darkOnTop ? 8 - movementY : movementY - 1,
 	};
 
-	console.log("movement coords", movementCoords);
-
 	// Revisamos si el movimiento está en possible movements de la pieza a mover
 	const selectedPiece = pieces.find((p) => {
 		return p.position.x === pieceCoords.x && p.position.y === pieceCoords.y;
 	});
-
-	console.log("selectedPiece", selectedPiece);
 
 	const possibleMovements =
 		selectedPiece.type === "pawn"
@@ -1115,8 +1114,6 @@ const validateMovement = (pieces, piece, movement, darkOnTop, lastMovement) => {
 					lastMovement
 			  );
 
-	console.log("possibleMovements", possibleMovements);
-
 	// Validar que el movimiento sea posible con coordenadas y extraerlo con el find
 	const checkMovement = possibleMovements.find((pm) => {
 		return pm.x === movementCoords.x && pm.y === movementCoords.y;
@@ -1129,10 +1126,8 @@ const validateMovement = (pieces, piece, movement, darkOnTop, lastMovement) => {
 		piece: selectedPiece,
 		movement: movementCoords,
 		isTake: checkMovement?.isTake ? true : false,
+		conversionType,
 	};
-
-	// Estructura del return
-	// {isValid: bool, piece: coords, movement: coord, isTake:bool}
 };
 
 export {

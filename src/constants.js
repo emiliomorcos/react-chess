@@ -1,3 +1,184 @@
+const testHistory = [
+	{
+		light: "e4",
+		dark: "e6",
+	},
+	{
+		light: "Qg4",
+		dark: "Qh4",
+	},
+	{
+		light: "Qxg7",
+		dark: "Qxh2",
+	},
+	{
+		light: "Qxh7",
+		dark: "Qxh1",
+	},
+	{
+		light: "Qxh8",
+		dark: "Qxg2",
+	},
+	{
+		light: "Qxg8",
+		dark: "Qxg1",
+	},
+	{
+		light: "Qxf7+",
+		dark: "Kd8",
+	},
+	{
+		light: "Qxe6",
+		dark: "Qxf2+",
+	},
+	{
+		light: "Kd1",
+		dark: "Qf4",
+	},
+	{
+		light: "Qb6",
+		dark: "Qxe4",
+	},
+	{
+		light: "Qxa7",
+		dark: "Qxc2+",
+	},
+	{
+		light: "Ke1",
+		dark: "Qxb2",
+	},
+	{
+		light: "Qxa8",
+		dark: "Qxa2",
+	},
+	{
+		light: "Qxb8",
+		dark: "Qxa1",
+	},
+	{
+		light: "Qxb7",
+		dark: "Qxb1",
+	},
+	{
+		light: "Qxc8+",
+		dark: "Ke7",
+	},
+	{
+		light: "Qxf8+",
+		dark: "Ke6",
+	},
+	{
+		light: "Qf5+",
+		dark: "Ke7",
+	},
+	{
+		light: "d3",
+		dark: "Qxd3",
+	},
+	{
+		light: "Qd5",
+		dark: "Qxf1+",
+	},
+	{
+		light: "Kd2",
+		dark: "Kd8",
+	},
+	{
+		light: "Ke3",
+		dark: "Qxc1+",
+	},
+	{
+		light: "Kf2",
+		dark: "Qh6",
+	},
+	{
+		light: "Qf7",
+		dark: "Kc8",
+	},
+	{
+		light: "Qe7",
+		dark: "Kb8",
+	},
+	{
+		light: "Qxd7",
+		dark: "Ka8",
+	},
+	{
+		light: "Kg2",
+		dark: "c5",
+	},
+	{
+		light: "Qc7",
+		dark: "Qb6",
+	},
+	{
+		light: "Qxb6",
+		dark: "c4",
+	},
+	{
+		light: "Qc7",
+		dark: "c3",
+	},
+	{
+		light: "Kh1",
+		dark: "c2",
+	},
+	{
+		light: "Qb6",
+	},
+];
+
+const testPieces = [
+	{
+		name: "darkKing",
+		type: "king",
+		position: {
+			x: 0,
+			y: 0,
+		},
+		color: "dark",
+		image: "kd.png",
+		movements: [],
+		hasMoved: true,
+	},
+	{
+		name: "darkPawn3",
+		type: "pawn",
+		position: {
+			x: 2,
+			y: 6,
+		},
+		color: "dark",
+		image: "pd.png",
+		movements: [],
+		hasMoved: true,
+	},
+	{
+		name: "lightQueen",
+		type: "queen",
+		position: {
+			x: 1,
+			y: 2,
+		},
+		color: "light",
+		image: "ql.png",
+		movements: [],
+		hasMoved: true,
+	},
+	{
+		name: "lightKing",
+		type: "king",
+		position: {
+			x: 7,
+			y: 7,
+		},
+		color: "light",
+		image: "kl.png",
+		movements: [],
+		hasMoved: true,
+	},
+];
+
 const defineInitialPositions = (numbers) => {
 	const darkOnTop = numbers[0] === "8";
 
@@ -288,4 +469,4 @@ const defineInitialPositions = (numbers) => {
 	return [...darkPieces, ...lightPieces];
 };
 
-export { defineInitialPositions };
+export { defineInitialPositions, testHistory, testPieces };

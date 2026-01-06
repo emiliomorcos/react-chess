@@ -12,9 +12,9 @@ import {
 	getPieceMovements,
 	getMovementsInCommon,
 	getMovementString,
-	validateMovement,
 } from "./movements";
-import { createMovement } from "../../../openai";
+import { getImage } from "../../../game";
+
 import PawnModal from "../pawnModal";
 
 // Generamos tablero
@@ -44,6 +44,9 @@ const Board = ({
 	gameTypeName,
 	color,
 	difficulty,
+	getLastMovement,
+	getNewHistory,
+	generateAIMovement,
 }) => {
 	const darkOnTop = numbers[0] === "8";
 
@@ -70,36 +73,8 @@ const Board = ({
 		}
 	}, [selectedPiece]);
 
-	const getImage = (type, color) => {
-		var imageString = "";
-		switch (type) {
-			case "queen":
-				imageString = `q${color.charAt(0)}.png`;
-				break;
-
-			case "rook":
-				imageString = `r${color.charAt(0)}.png`;
-				break;
-
-			case "bishop":
-				imageString = `b${color.charAt(0)}.png`;
-				break;
-
-			case "knight":
-				imageString = `n${color.charAt(0)}.png`;
-				break;
-
-			default:
-				imageString = `p${color.charAt(0)}.png`;
-				break;
-		}
-
-		return imageString;
-	};
-
 	const convertPawn = (pieceType) => {
 		var tempPieces;
-		console.log("convertPawn to", pieceType);
 		if (openPawnModal.type === "move") {
 			tempPieces = movePieceOnTake(
 				[...pieces],
@@ -181,11 +156,9 @@ const Board = ({
 		if (kingOnCheck) {
 			if (tempKing.color === "light") {
 				setLightKingOnCheck(true);
-				console.log("light king on check true");
 				tempLightCheck = true;
 			} else {
 				setDarkKingOnCheck(true);
-				console.log("dark king on check true");
 				tempDarkCheck = true;
 			}
 		} else {
@@ -275,25 +248,6 @@ const Board = ({
 	};
 
 	// Use Effect de chequeo si hay historial
-
-	const getNewHistory = (piece, movementString) => {
-		var tempHistory = [...history];
-		if (piece.color === "light") {
-			tempHistory.push({ light: movementString });
-		} else {
-			tempHistory[tempHistory.length - 1].dark = movementString;
-		}
-
-		return tempHistory;
-	};
-
-	const getLastMovement = () => {
-		if (!history.length) {
-			return "";
-		}
-		const lastTurn = history[history.length - 1];
-		return lastTurn.dark ? lastTurn.dark : lastTurn.light;
-	};
 
 	// Definimos colores de cuadros con base en matriz y determinamos si hay una pieza en un square
 	const getSquareClassname = (x, y, hasPiece) => {
@@ -434,7 +388,7 @@ const Board = ({
 						);
 						castleDirection = "short";
 
-						// ENROQUE A LA IZQUIERDA (corto)
+						// ENROQUE A LA IZQUIERDA (largo)
 					} else {
 						const rookToMove = pieces.find((p) => {
 							return (
@@ -605,33 +559,9 @@ const Board = ({
 
 				// DO WHILE para ejecutar una vez el código y si isValid sigue siendo false ciclar en el while hasta que regrese true
 
-				let isValid = false;
-				let regenerate = false;
-				let lastGeneratedMovement;
-
-				do {
-					const newMovement = await createMovement(
-						difficulty,
-						newHistory,
-						color === "light" ? "dark" : "light",
-						regenerate,
-						lastGeneratedMovement
-					);
-
-					const validation = validateMovement(
-						pieces,
-						newMovement.pieza,
-						newMovement.movimiento,
-						darkOnTop,
-						getLastMovement()
-					);
-
-					isValid = validation.isValid;
-					regenerate = true;
-					lastGeneratedMovement = newMovement;
-				} while (!isValid);
-
-				console.log("Movimiento IA:", newMovement);
+				if (gameTypeName === "ai") {
+					generateAIMovement(newHistory, tempPieces);
+				}
 			}
 			return;
 		}
@@ -736,10 +666,6 @@ const Board = ({
 			//Revisar si hay jaque mate o stalemate
 			//Checar si hay algun movimimento posible para piezas del color del rey
 
-			const friendlyPieces = tempPieces.filter(
-				(p) => p.color === tempKing.color
-			);
-
 			const movementString = getMovementString(
 				selectedPiece,
 				pieces,
@@ -756,6 +682,10 @@ const Board = ({
 			// Si se movió uno negro -> lo agregamos al ultimo arreglo history
 			const newHistory = getNewHistory(selectedPiece, movementString);
 			setHistory(newHistory);
+
+			const friendlyPieces = tempPieces.filter(
+				(p) => p.color === tempKing.color
+			);
 
 			var noMovesLeft = true;
 
@@ -832,6 +762,11 @@ const Board = ({
 				tempStalemate,
 				tempWinner
 			);
+
+			if (gameTypeName === "ai") {
+				generateAIMovement(newHistory, tempPieces);
+			}
+
 			return;
 		}
 

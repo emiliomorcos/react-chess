@@ -1,12 +1,12 @@
 import axios from "axios";
 import { system_prompts } from "./prompts.js";
 
-const openAIApiKey = import.meta.VITE_OPENAI_API_KEY;
+const openAIApiKey = import.meta.env.VITE_OPENAI_API_KEY;
 
 // Instancia de axios
 const api = axios.create({
 	baseURL: "https://api.openai.com/v1",
-	timeout: 50000,
+	timeout: 80000,
 	headers: {
 		Authorization: `Bearer ${openAIApiKey}`,
 	},
@@ -50,6 +50,7 @@ const createMovement = async (
 		// Checar si el movimiento es legal
 		for (let element of response.data.output) {
 			if (element.type === "message") {
+				console.log("element.content[0].text", element.content[0].text);
 				return JSON.parse(element.content[0].text);
 			}
 		}
