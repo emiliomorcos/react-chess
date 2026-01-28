@@ -80,7 +80,7 @@ const Board = ({
 				[...pieces],
 				selectedPiece,
 				openPawnModal.coords.x,
-				openPawnModal.coords.y
+				openPawnModal.coords.y,
 			);
 		} else {
 			const piece = pieces.find((p) => {
@@ -96,7 +96,7 @@ const Board = ({
 				tempPieces,
 				selectedPiece,
 				openPawnModal.coords.x,
-				openPawnModal.coords.y
+				openPawnModal.coords.y,
 			);
 
 			if (darkOnTop) {
@@ -151,7 +151,7 @@ const Board = ({
 			tempPieces,
 			tempKing.position,
 			tempKing,
-			darkOnTop
+			darkOnTop,
 		);
 		if (kingOnCheck) {
 			if (tempKing.color === "light") {
@@ -178,14 +178,14 @@ const Board = ({
 			false,
 			lastCoordinates,
 			darkOnTop,
-			pieceType
+			pieceType,
 		);
 
 		const newHistory = getNewHistory(selectedPiece, movementString);
 		setHistory(newHistory);
 
 		const friendlyPieces = tempPieces.filter(
-			(p) => p.color === tempKing.color
+			(p) => p.color === tempKing.color,
 		);
 
 		var noMovesLeft = true;
@@ -200,7 +200,7 @@ const Board = ({
 				tempPieces,
 				darkOnTop,
 				true,
-				getLastMovement()
+				getLastMovement(),
 			);
 
 			if (friendlyPieceMovements.length) {
@@ -242,7 +242,7 @@ const Board = ({
 			tempDarkCheck,
 			tempCheckmate,
 			tempStalemate,
-			tempWinner
+			tempWinner,
 		);
 		setOpenPawnModal({ open: false, coords: {}, type: "" });
 	};
@@ -299,7 +299,7 @@ const Board = ({
 		hasPiece,
 		isPossibleMovement,
 		isPossibleTake,
-		isCastle
+		isCastle,
 	) => {
 		if (checkmate || stalemate) {
 			return;
@@ -343,7 +343,7 @@ const Board = ({
 							commonPiece,
 							pieces,
 							darkOnTop,
-							true
+							true,
 						);
 					}
 				}
@@ -362,7 +362,7 @@ const Board = ({
 					[...pieces],
 					selectedPiece,
 					x,
-					y
+					y,
 				);
 
 				// ----------- ENROQUE -----------
@@ -383,8 +383,8 @@ const Board = ({
 						tempPieces = movePieceOnTake(
 							[...pieces],
 							rookToMove,
-							5,
-							rookToMove.position.y
+							darkOnTop ? 5 : 4,
+							rookToMove.position.y,
 						);
 						castleDirection = "short";
 
@@ -401,8 +401,8 @@ const Board = ({
 						tempPieces = movePieceOnTake(
 							[...pieces],
 							rookToMove,
-							3,
-							rookToMove.position.y
+							darkOnTop ? 3 : 2,
+							rookToMove.position.y,
 						);
 						castleDirection = "long";
 					}
@@ -448,7 +448,7 @@ const Board = ({
 					pieces,
 					tempKing.position,
 					tempKing,
-					darkOnTop
+					darkOnTop,
 				);
 
 				if (kingOnCheck) {
@@ -470,7 +470,7 @@ const Board = ({
 				//Checar si hay algun movimimento posible para piezas del color del rey
 
 				const friendlyPieces = tempPieces.filter(
-					(p) => p.color === tempKing.color
+					(p) => p.color === tempKing.color,
 				);
 
 				var noMovesLeft = true;
@@ -485,7 +485,7 @@ const Board = ({
 						tempPieces,
 						darkOnTop,
 						true,
-						getLastMovement()
+						getLastMovement(),
 					);
 
 					if (friendlyPieceMovements.length) {
@@ -509,7 +509,7 @@ const Board = ({
 						kingOnCheck,
 						isCommon,
 						lastCoordinates,
-						darkOnTop
+						darkOnTop,
 					);
 				}
 
@@ -527,7 +527,7 @@ const Board = ({
 						setCheckmate(true);
 						tempCheckmate = true;
 						setWinner(
-							tempKing.color === "light" ? "dark" : "light"
+							tempKing.color === "light" ? "dark" : "light",
 						);
 						tempWinner =
 							tempKing.color === "light" ? "dark" : "light";
@@ -554,7 +554,7 @@ const Board = ({
 					tempDarkCheck,
 					tempCheckmate,
 					tempStalemate,
-					tempWinner
+					tempWinner,
 				);
 
 				// DO WHILE para ejecutar una vez el código y si isValid sigue siendo false ciclar en el while hasta que regrese true
@@ -602,7 +602,7 @@ const Board = ({
 						commonPiece,
 						pieces,
 						darkOnTop,
-						true
+						true,
 					);
 				}
 			}
@@ -645,7 +645,7 @@ const Board = ({
 				pieces,
 				tempKing.position,
 				tempKing,
-				darkOnTop
+				darkOnTop,
 			);
 
 			if (kingOnCheck) {
@@ -675,7 +675,7 @@ const Board = ({
 				kingOnCheck,
 				isCommon,
 				lastCoordinates,
-				darkOnTop
+				darkOnTop,
 			);
 
 			// Si se movió uno blanco -> creamos objeto en el arreglo history
@@ -684,7 +684,7 @@ const Board = ({
 			setHistory(newHistory);
 
 			const friendlyPieces = tempPieces.filter(
-				(p) => p.color === tempKing.color
+				(p) => p.color === tempKing.color,
 			);
 
 			var noMovesLeft = true;
@@ -698,7 +698,7 @@ const Board = ({
 					friendlyPiece.position.y,
 					tempPieces,
 					darkOnTop,
-					true
+					true,
 				);
 
 				if (friendlyPieceMovements.length) {
@@ -738,8 +738,8 @@ const Board = ({
 					? [...capturesBottom, piece]
 					: capturesBottom
 				: piece.color === "dark"
-				? capturesBottom
-				: [...capturesBottom, piece];
+					? capturesBottom
+					: [...capturesBottom, piece];
 
 			var newCapturesTop = capturesTop;
 			newCapturesTop = darkOnTop
@@ -747,8 +747,8 @@ const Board = ({
 					? capturesTop
 					: [...capturesTop, piece]
 				: piece.color === "dark"
-				? [...capturesTop, piece]
-				: capturesTop;
+					? [...capturesTop, piece]
+					: capturesTop;
 
 			// Possible take
 			saveGame(
@@ -760,7 +760,7 @@ const Board = ({
 				tempDarkCheck,
 				tempCheckmate,
 				tempStalemate,
-				tempWinner
+				tempWinner,
 			);
 
 			if (gameTypeName === "ai") {
@@ -788,7 +788,7 @@ const Board = ({
 					darkOnTop,
 					pieces,
 					true,
-					getLastMovement()
+					getLastMovement(),
 				);
 				break;
 
@@ -799,7 +799,7 @@ const Board = ({
 					y,
 					pieces,
 					darkOnTop,
-					true
+					true,
 				);
 				break;
 
@@ -810,7 +810,7 @@ const Board = ({
 					y,
 					pieces,
 					darkOnTop,
-					true
+					true,
 				);
 				break;
 
@@ -821,7 +821,7 @@ const Board = ({
 					y,
 					pieces,
 					darkOnTop,
-					true
+					true,
 				);
 				break;
 
@@ -832,7 +832,7 @@ const Board = ({
 					y,
 					pieces,
 					darkOnTop,
-					true
+					true,
 				);
 				break;
 			case "queen":
@@ -842,7 +842,7 @@ const Board = ({
 					y,
 					pieces,
 					darkOnTop,
-					true
+					true,
 				);
 				break;
 		}
@@ -862,7 +862,7 @@ const Board = ({
 					const isPossibleMovement = possiblePieceMovements.some(
 						(movement) => {
 							return movement.x === x && movement.y === y;
-						}
+						},
 					);
 					const isPossibleTake = possiblePieceMovements.some(
 						(movement) => {
@@ -871,7 +871,7 @@ const Board = ({
 								movement.y === y &&
 								movement.isTake
 							);
-						}
+						},
 					);
 
 					// Definir isCastle
@@ -894,7 +894,7 @@ const Board = ({
 									hasPiece,
 									isPossibleMovement,
 									isPossibleTake,
-									isCastle
+									isCastle,
 								)
 							}
 						>

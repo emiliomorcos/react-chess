@@ -19,7 +19,6 @@ const Menu = () => {
 		const tempConfiguration = JSON.parse(
 			localStorage.getItem(`${gameType}_${color}`)
 		);
-		console.log("tempConfiguration", tempConfiguration);
 
 		setConfiguration(tempConfiguration);
 	}, [gameType, color]);

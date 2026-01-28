@@ -89,7 +89,7 @@ const Game = () => {
 		darkKingOnCheck,
 		tempCheckmate,
 		tempStalemate,
-		winner
+		winner,
 	) => {
 		// Aquí se guardaria el estado del juego en localStorage
 
@@ -175,15 +175,16 @@ const Game = () => {
 				newHistory,
 				color === "white" ? "dark" : "light",
 				regenerate,
-				lastGeneratedMovement
+				lastGeneratedMovement,
 			);
+			// var newMovement = { pieza: "a2", movimiento: "a3" };
 
 			var validation = validateMovement(
 				tempPieces,
 				newMovement.pieza,
 				newMovement.movimiento,
 				darkOnTop,
-				getLastMovement()
+				getLastMovement(),
 			);
 
 			isValid = validation.isValid;
@@ -198,13 +199,84 @@ const Game = () => {
 			);
 		});
 
+		var currentPieceX = validation.piece.position.x;
+
 		var aiTempPieces = movePieceOnTake(
 			tempPieces,
 			validation.piece,
 			validation.movement.x,
 			validation.movement.y,
-			validation.isTake
+			validation.isTake,
 		);
+
+		console.log("AItempPieces after first move:", aiTempPieces);
+
+		if (validation.isCastle) {
+			// Encontrar la torre a mover
+			console.log("validation.piece", validation.piece);
+			if (currentPieceX === 4) {
+				console.log(
+					"newMovement y length: ",
+					newMovement.movimiento,
+					newMovement.movimiento.length,
+				);
+				var rookToCastle = aiTempPieces.find((p) => {
+					return (
+						p.type === "rook" &&
+						p.color === validation.piece.color &&
+						p.position.x ===
+							(newMovement.movimiento.length > 3 ? 0 : 7)
+					);
+				});
+				console.log("rookToCastle", rookToCastle);
+				// MOVE ROOK ON CASTLE
+				if (rookToCastle.position.x === 0) {
+					var aiTempPieces = movePieceOnTake(
+						tempPieces,
+						rookToCastle,
+						3,
+						rookToCastle.position.y,
+						false,
+					);
+				} else {
+					var aiTempPieces = movePieceOnTake(
+						tempPieces,
+						rookToCastle,
+						5,
+						rookToCastle.position.y,
+						false,
+					);
+				}
+			} else {
+				console.log("rookToCastle", rookToCastle);
+				var rookToCastle = aiTempPieces.find((p) => {
+					return (
+						p.type === "rook" &&
+						p.color === validation.piece.color &&
+						p.position.x ===
+							(newMovement.movimiento.length > 3 ? 7 : 0)
+					);
+				});
+				// MOVE ROOK ON CASTLE
+				if (rookToCastle.position.x === 0) {
+					var aiTempPieces = movePieceOnTake(
+						tempPieces,
+						rookToCastle,
+						2,
+						rookToCastle.position.y,
+						false,
+					);
+				} else {
+					var aiTempPieces = movePieceOnTake(
+						tempPieces,
+						rookToCastle,
+						4,
+						rookToCastle.position.y,
+						false,
+					);
+				}
+			}
+		}
 
 		if (validation.conversionType) {
 			let pieceType;
@@ -253,7 +325,7 @@ const Game = () => {
 		var aiNewHistory = getNewHistory(
 			validation.piece,
 			newMovement.movimiento,
-			newHistory
+			newHistory,
 		);
 
 		setHistory(aiNewHistory);
@@ -275,7 +347,7 @@ const Game = () => {
 			tempPieces,
 			tempKing.position,
 			tempKing,
-			darkOnTop
+			darkOnTop,
 		);
 
 		if (kingOnCheck) {
@@ -297,7 +369,7 @@ const Game = () => {
 		setTurn(color === "white" ? "light" : "dark");
 
 		const friendlyPieces = tempPieces.filter(
-			(p) => p.color === tempKing.color
+			(p) => p.color === tempKing.color,
 		);
 
 		var noMovesLeft = true;
@@ -311,7 +383,7 @@ const Game = () => {
 				friendlyPiece.position.y,
 				tempPieces,
 				darkOnTop,
-				true
+				true,
 			);
 
 			if (friendlyPieceMovements.length) {
@@ -346,7 +418,7 @@ const Game = () => {
 			tempDarkCheck,
 			tempCheckmate,
 			tempStalemate,
-			tempWinner
+			tempWinner,
 		);
 	};
 
@@ -360,15 +432,15 @@ const Game = () => {
 								? "turn"
 								: ""
 							: turn === "light"
-							? "turn"
-							: ""
+								? "turn"
+								: ""
 					}
 				>
 					{gameType === "two-players"
 						? player2
 						: color === "white"
-						? player2
-						: player1}
+							? player2
+							: player1}
 				</h2>
 				<div className="captures">
 					{types.map((type) => {
@@ -478,22 +550,22 @@ const Game = () => {
 									? ""
 									: "turn"
 								: turn === "light"
-								? ""
-								: "turn"
+									? ""
+									: "turn"
 						}
 					>
 						{gameType === "two-players"
 							? player1
 							: color === "white"
-							? player1
-							: player2}
+								? player1
+								: player2}
 					</h2>
 					<div className="captures">
 						{types.map((type) => {
 							const tempTypeList = capturesBottom.filter(
 								(capture) => {
 									return capture.type === type;
-								}
+								},
 							);
 
 							var extraWidth = 0;

@@ -52,6 +52,7 @@ Devuelve solo un objeto JSON con esta estructura:
 📌 Instrucciones adicionales: 
 - No expliques tu jugada. 
 - No incluyas ningún texto fuera del JSON.
+- Si hay una captura en passant disponible, debes realizarla.
 `;
 
 const system_prompts = {
