@@ -262,7 +262,6 @@ const getPawnMovements = (
 	fromBoard = false,
 	lastMovement,
 ) => {
-	console.log("lastMovement", lastMovement);
 	var possibleMovements = [];
 
 	possibleMovements = darkOnTop
@@ -395,8 +394,6 @@ const getPawnMovements = (
 
 	// ----------- EN PASSANT fila 4 -----------
 	if (y === 4) {
-		console.log("entramos a en passant fila 4");
-
 		if (!darkOnTop && piece.color === "light") {
 			if (checkEnPassant(pieces, piece, lastx, lasty)) {
 				filteredMovements.push({
@@ -408,7 +405,6 @@ const getPawnMovements = (
 		}
 
 		if (darkOnTop && piece.color === "dark") {
-			console.log("Entramos a darkontop y dark pawn en passant");
 			if (checkEnPassant(pieces, piece, lastx, lasty)) {
 				filteredMovements.push({
 					x: lastx,
@@ -553,16 +549,12 @@ const getKingMovements = (
 			return p.type === "rook" && p.color === piece.color;
 		});
 
-		console.log("Rook 1 in king movements:", rook1);
-
 		const rook2 = pieces.find((p) => {
 			return (
 				p.type === "rook" &&
 				p.color === piece.color &&
 				p.name !== rook1?.name
 			);
-
-			console.log("Rook 2 in king movements:", rook2);
 		});
 		// ver si las torres amigas no se han movido
 		if (rook1 && !rook1.hasMoved) {
@@ -638,7 +630,6 @@ const getKingMovements = (
 						castle1 = true;
 					}
 				}
-				console.log("Castle 1 possible:", castle1);
 				if (castle1) {
 					filteredMovements.push({
 						x: piece.position.x - 2,
@@ -719,8 +710,6 @@ const getKingMovements = (
 			}
 		}
 
-		console.log("Filtered king movements after rook1:", filteredMovements);
-
 		if (rook2 && !rook2.hasMoved) {
 			const rook2Movements = getRookMovements(
 				rook2,
@@ -729,16 +718,10 @@ const getKingMovements = (
 				pieces,
 				darkOnTop,
 			);
-			console.log("entramos a if de rook 2");
-
-			console.log("Rook 2", rook2);
 
 			var castle2 = false;
 
-			console.log("Rook 2 movements:", rook2Movements);
-
 			if (!darkOnTop && rook2Movements.length >= 3) {
-				console.log("Entramos a !darkontop y rook2 movementes >= 3");
 				for (let i = 3; i > 0; i--) {
 					// Si no tiene el movimiento que se salga del for (que ya no cheque más)
 					if (
@@ -1171,17 +1154,12 @@ const validateMovement = (pieces, piece, movement, darkOnTop, lastMovement) => {
 	let movementCoords;
 	let isCastle = false;
 
-	console.log("VALIDATE MOVEMENT:", movement);
-
 	if (movement.includes("O") || movement.includes("0")) {
-		console.log("Entramos a enroque IF");
 		if (movement.length > 3) {
-			console.log("Entramos a enroque LONG");
 			// Long
 			castleX = darkOnTop ? 2 : 5;
 			castleY = pieceCoords.y;
 		} else {
-			console.log("Entramos a enroque SHORT");
 			// Short
 			castleX = darkOnTop ? 6 : 1;
 			castleY = pieceCoords.y;
@@ -1210,7 +1188,6 @@ const validateMovement = (pieces, piece, movement, darkOnTop, lastMovement) => {
 
 	// Convertirmos a coordenadas
 	if (castleX !== undefined && castleY !== undefined) {
-		console.log("Entramos a enroque coordenadas");
 		isCastle = true;
 		movementCoords = {
 			x: castleX,
@@ -1225,14 +1202,10 @@ const validateMovement = (pieces, piece, movement, darkOnTop, lastMovement) => {
 		};
 	}
 
-	console.log("Movement coords: ", movementCoords);
-
 	// Revisamos si el movimiento está en possible movements de la pieza a mover
 	const selectedPiece = pieces.find((p) => {
 		return p.position.x === pieceCoords.x && p.position.y === pieceCoords.y;
 	});
-
-	console.log("Selected piece:", selectedPiece);
 
 	const possibleMovements =
 		selectedPiece.type === "pawn"
@@ -1254,8 +1227,6 @@ const validateMovement = (pieces, piece, movement, darkOnTop, lastMovement) => {
 					true,
 					lastMovement,
 				);
-
-	console.log("Possible movements:", possibleMovements);
 
 	// Validar que el movimiento sea posible con coordenadas y extraerlo con el find
 	const checkMovement = possibleMovements.find((pm) => {

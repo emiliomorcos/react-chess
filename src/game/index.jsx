@@ -116,11 +116,11 @@ const Game = () => {
 		localStorage.setItem(gameType, JSON.stringify(gameConfiguration));
 	};
 
-	const getLastMovement = () => {
-		if (!history.length) {
+	const getLastMovement = (newHistory = history) => {
+		if (!newHistory.length) {
 			return "";
 		}
-		const lastTurn = history[history.length - 1];
+		const lastTurn = newHistory[newHistory.length - 1];
 		return lastTurn.dark ? lastTurn.dark : lastTurn.light;
 	};
 
@@ -149,13 +149,11 @@ const Game = () => {
 		}
 
 		// Asignar todo a como está en la configuración guardada
-		// setHistory(actualConfiguration.history);
-		setHistory(testHistory);
+		setHistory(actualConfiguration.history);
 		setCapturesTop(actualConfiguration.capturesTop);
 		setCapturesBottom(actualConfiguration.capturesBottom);
 		setTurn(actualConfiguration.turn);
-		// setPieces(actualConfiguration.pieces);
-		setPieces(testPieces);
+		setPieces(actualConfiguration.pieces);
 		setLightKingOnCheck(actualConfiguration.lightKingOnCheck);
 		setDarkKingOnCheck(actualConfiguration.darkKingOnCheck);
 		setCheckmate(actualConfiguration.checkmate);
@@ -184,7 +182,7 @@ const Game = () => {
 				newMovement.pieza,
 				newMovement.movimiento,
 				darkOnTop,
-				getLastMovement(),
+				getLastMovement(newHistory),
 			);
 
 			isValid = validation.isValid;
@@ -192,7 +190,7 @@ const Game = () => {
 			lastGeneratedMovement = newMovement;
 		} while (!isValid);
 
-		const capturedPiece = tempPieces.find((p) => {
+		var capturedPiece = tempPieces.find((p) => {
 			return (
 				p.position.x === validation.movement.x &&
 				p.position.y === validation.movement.y
@@ -209,17 +207,9 @@ const Game = () => {
 			validation.isTake,
 		);
 
-		console.log("AItempPieces after first move:", aiTempPieces);
-
 		if (validation.isCastle) {
 			// Encontrar la torre a mover
-			console.log("validation.piece", validation.piece);
 			if (currentPieceX === 4) {
-				console.log(
-					"newMovement y length: ",
-					newMovement.movimiento,
-					newMovement.movimiento.length,
-				);
 				var rookToCastle = aiTempPieces.find((p) => {
 					return (
 						p.type === "rook" &&
@@ -228,7 +218,6 @@ const Game = () => {
 							(newMovement.movimiento.length > 3 ? 0 : 7)
 					);
 				});
-				console.log("rookToCastle", rookToCastle);
 				// MOVE ROOK ON CASTLE
 				if (rookToCastle.position.x === 0) {
 					var aiTempPieces = movePieceOnTake(
@@ -248,7 +237,6 @@ const Game = () => {
 					);
 				}
 			} else {
-				console.log("rookToCastle", rookToCastle);
 				var rookToCastle = aiTempPieces.find((p) => {
 					return (
 						p.type === "rook" &&
@@ -331,6 +319,17 @@ const Game = () => {
 		setHistory(aiNewHistory);
 
 		if (validation.isTake) {
+			if (validation.piece.type === "pawn" && !capturedPiece) {
+				// En passant
+				capturedPiece = aiTempPieces.find((p) => {
+					return (
+						p.position.x === validation.movement.x &&
+						p.position.y === validation.movement.y - 1
+					);
+				});
+				var aiTempPieceIndex = aiTempPieces.indexOf(capturedPiece);
+				aiTempPieces.splice(aiTempPieceIndex, 1);
+			}
 			var newCapturesTop = [...capturesTop, capturedPiece];
 
 			setCapturesTop(newCapturesTop);
