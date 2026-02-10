@@ -6,7 +6,6 @@ import { defineNumbers } from "../game";
 import { defineInitialPositions } from "../constants";
 import "./menu.css";
 
-//TODO: Agregar jugar al dar click a Enter
 const Menu = () => {
 	const [gameType, setGameType] = useState("two-players");
 	const [difficulty, setDifficulty] = useState("easy");
@@ -17,37 +16,11 @@ const Menu = () => {
 
 	useEffect(() => {
 		const tempConfiguration = JSON.parse(
-			localStorage.getItem(`${gameType}_${color}`)
+			localStorage.getItem(`${gameType}_${color}`),
 		);
 
 		setConfiguration(tempConfiguration);
 	}, [gameType, color]);
-
-	// useEffect(() => {
-	// 	const getJoke = async () => {
-	// 		try {
-	// 			const response = await api.get("/joke/Programming");
-	// 			console.log("Joke response:", response.data);
-	// 		} catch (error) {
-	// 			console.error("error fetching joke:", error);
-	// 		}
-	// 	};
-	// 	getJoke();
-	// }, []);
-
-	// Llamada de chiste de prueba
-	// useEffect(() => {
-	// 	const getJoke = async () => {
-	// 		try {
-	// 			const res = await fetch("https://v2.jokeapi.dev/joke/Any");
-	// 			console.log("res", await res.json());
-	// 		} catch (error) {
-	// 			console.error("Error fetching joke:", error);
-	// 		}
-	// 	};
-
-	// 	getJoke();
-	// }, []);
 
 	const navigate = useNavigate();
 	const [messageApi, contextHolder] = message.useMessage();
@@ -55,7 +28,7 @@ const Menu = () => {
 	const newGame = () => {
 		const newConfiguration = {
 			pieces: defineInitialPositions(
-				defineNumbers(`${gameType}_${color}`)
+				defineNumbers(`${gameType}_${color}`),
 			),
 			history: [],
 			player1: player1,
@@ -75,13 +48,13 @@ const Menu = () => {
 
 		localStorage.setItem(
 			`${gameType}_${color}`,
-			JSON.stringify(newConfiguration)
+			JSON.stringify(newConfiguration),
 		);
 
 		navigate(
 			`/game/${gameType}_${color}/${player1}/${
 				gameType === "two-players" ? player2 : "default"
-			}/${gameType === "two-players" ? "default" : difficulty}`
+			}/${gameType === "two-players" ? "default" : difficulty}`,
 		);
 	};
 
@@ -111,9 +84,15 @@ const Menu = () => {
 						gameType === "two-players"
 							? "default"
 							: configuration.difficulty
-					}`
+					}`,
 				);
 			}
+		}
+	};
+
+	const handleOnKeyDown = (e) => {
+		if (e.key === "Enter") {
+			handlePlay(true);
 		}
 	};
 
@@ -128,7 +107,7 @@ const Menu = () => {
 							gameType === "two-players" ? "primary" : "default"
 						}
 						onClick={() => {
-							setGameType("two-players"), setColor("white");
+							(setGameType("two-players"), setColor("white"));
 						}}
 					>
 						2 jugadores
@@ -148,6 +127,7 @@ const Menu = () => {
 					type="text"
 					placeholder="Ingresa el nombre"
 					onChange={(e) => setPlayer1(e.target.value)}
+					onKeyDown={handleOnKeyDown}
 				/>
 
 				{gameType === "two-players" ? (
@@ -157,6 +137,7 @@ const Menu = () => {
 							type="text"
 							placeholder="Ingresa el nombre"
 							onChange={(e) => setPlayer2(e.target.value)}
+							onKeyDown={handleOnKeyDown}
 						/>
 					</>
 				) : (

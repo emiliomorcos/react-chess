@@ -1117,8 +1117,6 @@ const getMovementsInCommon = (
 };
 
 const validateMovement = (pieces, piece, movement, darkOnTop, lastMovement) => {
-	// TODO: MANEJAR ENROQUE, PROMOCIÓN DE PEONES Y EN PASSANT
-
 	const xvalues = {
 		a: 7,
 		b: 6,

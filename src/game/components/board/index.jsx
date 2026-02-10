@@ -226,12 +226,23 @@ const Board = ({
 			setTurn("");
 		}
 
+		console.log("Antes de cambio de turn en board:  ", turn);
+
 		setSelectedPiece(null);
+
+		var newTurn;
+
 		if (turn === "light") {
+			console.log("Entramos a if LIGHT board");
+			newTurn = "dark";
 			setTurn("dark");
 		} else {
+			console.log("Entramos a if DARK board");
+			newTurn = "light";
 			setTurn("light");
 		}
+
+		console.log("Despues de cambio de turn en board:  ", turn);
 
 		saveGame(
 			tempPieces,
@@ -243,6 +254,7 @@ const Board = ({
 			tempCheckmate,
 			tempStalemate,
 			tempWinner,
+			newTurn,
 		);
 		setOpenPawnModal({ open: false, coords: {}, type: "" });
 	};
@@ -314,6 +326,8 @@ const Board = ({
 		if (!hasPiece) {
 			// -------------------- POSSIBLE MOVEMENT --------------------
 			if (isPossibleMovement) {
+				setLightKingOnCheck(false);
+				setDarkKingOnCheck(false);
 				var pieceCommonMovements = [];
 
 				// Conversión de peones
@@ -452,6 +466,7 @@ const Board = ({
 				);
 
 				if (kingOnCheck) {
+					console.log("El rey " + tempKing.color + " está en jaque");
 					if (tempKing.color === "light") {
 						setLightKingOnCheck(true);
 						tempLightCheck = true;
@@ -539,11 +554,17 @@ const Board = ({
 				}
 
 				setSelectedPiece(null);
+
+				var newTurn;
+
 				if (turn === "light") {
+					newTurn = "dark";
 					setTurn("dark");
 				} else {
+					newTurn = "light";
 					setTurn("light");
 				}
+
 				// Possible movement
 				saveGame(
 					tempPieces,
@@ -555,6 +576,7 @@ const Board = ({
 					tempCheckmate,
 					tempStalemate,
 					tempWinner,
+					newTurn,
 				);
 
 				// DO WHILE para ejecutar una vez el código y si isValid sigue siendo false ciclar en el while hasta que regrese true
@@ -573,6 +595,9 @@ const Board = ({
 		// -------------------- POSSIBLE TAKE --------------------
 		//  Checar si el square con pieza es un possible movement && isTake === true
 		if (isPossibleTake) {
+			setLightKingOnCheck(false);
+			setDarkKingOnCheck(false);
+
 			var pieceCommonMovements = [];
 
 			// Conversion de peones
@@ -649,6 +674,7 @@ const Board = ({
 			);
 
 			if (kingOnCheck) {
+				console.log("El rey " + tempKing.color + " está en jaque");
 				if (tempKing.color === "light") {
 					setLightKingOnCheck(true);
 					tempLightCheck = true;
@@ -725,9 +751,15 @@ const Board = ({
 			}
 
 			setSelectedPiece(null);
+			var newTurn;
+
 			if (turn === "light") {
+				console.log("Entramos a if LIGHT board");
+				newTurn = "dark";
 				setTurn("dark");
 			} else {
+				console.log("Entramos a if DARK board");
+				newTurn = "light";
 				setTurn("light");
 			}
 
@@ -761,6 +793,7 @@ const Board = ({
 				tempCheckmate,
 				tempStalemate,
 				tempWinner,
+				newTurn,
 			);
 
 			if (gameTypeName === "ai") {

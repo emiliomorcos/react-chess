@@ -1,6 +1,7 @@
 import "./game.css";
 import { useParams } from "react-router-dom";
 import Board from "./components/board";
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
 	movePieceOnTake,
@@ -10,7 +11,6 @@ import {
 } from "./components/board/movements";
 import { createMovement } from "../openai/index.js";
 import EndgameModal from "./components/endgameModal";
-import { testHistory, testPieces } from "../constants.js";
 
 // Types para mostrar capturas
 let types = ["pawn", "knight", "bishop", "rook", "queen", "king"];
@@ -56,6 +56,7 @@ const getImage = (type, color) => {
 };
 
 const Game = () => {
+	const navigate = useNavigate();
 	const { gameType, player1, player2, difficulty } = useParams();
 
 	const [capturesTop, setCapturesTop] = useState([]);
@@ -90,10 +91,14 @@ const Game = () => {
 		tempCheckmate,
 		tempStalemate,
 		winner,
+		newTurn,
 	) => {
 		// Aquí se guardaria el estado del juego en localStorage
 
 		// Keys: "ai_<color>", "two-players-<color>"
+
+		console.log("Entrando a saveGame -> Turn: ", turn);
+		console.log("Entrando a saveGame -> color: ", color);
 
 		const gameConfiguration = {
 			pieces: pieces,
@@ -104,7 +109,7 @@ const Game = () => {
 			capturesBottom: newCapturesBottom,
 			gametype: gameType,
 			difficulty: difficulty,
-			turn: turn === "light" ? "dark" : "light",
+			turn: newTurn,
 			isNew: false,
 			lightKingOnCheck: lightKingOnCheck,
 			darkKingOnCheck: darkKingOnCheck,
@@ -135,6 +140,10 @@ const Game = () => {
 
 		return tempHistory;
 	};
+
+	useEffect(() => {
+		console.log("Cambio de turn en game: ", turn);
+	}, [turn]);
 
 	useEffect(() => {
 		const actualConfiguration = JSON.parse(localStorage.getItem(gameType));
@@ -189,6 +198,9 @@ const Game = () => {
 			regenerate = true;
 			lastGeneratedMovement = newMovement;
 		} while (!isValid);
+
+		setDarkKingOnCheck(false);
+		setLightKingOnCheck(false);
 
 		var capturedPiece = tempPieces.find((p) => {
 			return (
@@ -365,7 +377,11 @@ const Game = () => {
 		}
 
 		setPieces(aiTempPieces);
-		setTurn(color === "white" ? "light" : "dark");
+		var newTurn = color === "white" ? "light" : "dark";
+		setTurn(newTurn);
+
+		console.log("Color: ", color);
+		console.log("newTurn: ", newTurn);
 
 		const friendlyPieces = tempPieces.filter(
 			(p) => p.color === tempKing.color,
@@ -418,6 +434,7 @@ const Game = () => {
 			tempCheckmate,
 			tempStalemate,
 			tempWinner,
+			newTurn,
 		);
 	};
 
@@ -426,20 +443,18 @@ const Game = () => {
 			<div className="top">
 				<h2
 					className={
-						darkOnTop
+						!checkmate &&
+						!stalemate &&
+						(darkOnTop
 							? turn === "dark"
 								? "turn"
 								: ""
 							: turn === "light"
 								? "turn"
-								: ""
+								: "")
 					}
 				>
-					{gameType === "two-players"
-						? player2
-						: color === "white"
-							? player2
-							: player1}
+					{player2}
 				</h2>
 				<div className="captures">
 					{types.map((type) => {
@@ -544,20 +559,18 @@ const Game = () => {
 				<div className="player-info">
 					<h2
 						className={
-							darkOnTop
+							!checkmate &&
+							!stalemate &&
+							(darkOnTop
 								? turn === "dark"
 									? ""
 									: "turn"
 								: turn === "light"
 									? ""
-									: "turn"
+									: "turn")
 						}
 					>
-						{gameType === "two-players"
-							? player1
-							: color === "white"
-								? player1
-								: player2}
+						{player1}
 					</h2>
 					<div className="captures">
 						{types.map((type) => {
@@ -603,7 +616,9 @@ const Game = () => {
 				</div>
 
 				<div className="buttons-game">
-					<button>Menu</button>
+					<button id="menu-button" onClick={() => navigate("/")}>
+						Menu
+					</button>
 				</div>
 			</div>
 		</div>
