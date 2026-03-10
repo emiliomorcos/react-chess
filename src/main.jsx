@@ -6,7 +6,7 @@ import App from "./App.jsx";
 // TODO: DESCOMENTAR STRICT MODE EN PRODUCCIÓN
 
 createRoot(document.getElementById("root")).render(
-	// <StrictMode>
-	<App />
-	// </StrictMode>
+	<StrictMode>
+		<App />
+	</StrictMode>,
 );

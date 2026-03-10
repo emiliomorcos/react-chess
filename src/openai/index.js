@@ -16,7 +16,7 @@ const createSystemPrompt = (
 	difficulty,
 	turn,
 	regenerate,
-	lastGeneratedMovement
+	lastGeneratedMovement,
 ) => {
 	if (regenerate) {
 		return `${system_prompts[difficulty]} \n- Juegas como: ${turn}`;
@@ -30,7 +30,7 @@ const createMovement = async (
 	history,
 	turn,
 	regenerate,
-	lastGeneratedMovement
+	lastGeneratedMovement,
 ) => {
 	try {
 		const response = await api.post("/responses", {
@@ -38,11 +38,11 @@ const createMovement = async (
 			input: regenerate
 				? `Cometiste un error la última vez, el movimiento ${
 						lastGeneratedMovement.movimiento
-				  } que diste no es válido, ya que la pieza ${
+					} que diste no es válido, ya que la pieza ${
 						lastGeneratedMovement.pieza
-				  } no puede ir ahí desde su posición actual. \n\n ${JSON.stringify(
-						history
-				  )}`
+					} no puede ir ahí desde su posición actual. \n\n ${JSON.stringify(
+						history,
+					)}`
 				: JSON.stringify(history), // User prompt
 			instructions: `${system_prompts[difficulty]} \n- Juegas como: ${turn}`, // System prompt
 		});

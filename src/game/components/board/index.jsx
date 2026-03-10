@@ -581,7 +581,10 @@ const Board = ({
 
 				// DO WHILE para ejecutar una vez el código y si isValid sigue siendo false ciclar en el while hasta que regrese true
 
-				if (gameTypeName === "ai") {
+				if (
+					gameTypeName === "ai" &&
+					!(tempCheckmate || tempStalemate)
+				) {
 					generateAIMovement(newHistory, tempPieces);
 				}
 			}
@@ -796,7 +799,7 @@ const Board = ({
 				newTurn,
 			);
 
-			if (gameTypeName === "ai") {
+			if (gameTypeName === "ai" && !(tempCheckmate || tempStalemate)) {
 				generateAIMovement(newHistory, tempPieces);
 			}
 

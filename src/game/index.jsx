@@ -1,8 +1,9 @@
 import "./game.css";
+import { Spin } from "antd";
 import { useParams } from "react-router-dom";
 import Board from "./components/board";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
 	movePieceOnTake,
 	validateMovement,
@@ -56,6 +57,7 @@ const getImage = (type, color) => {
 };
 
 const Game = () => {
+	const executed = useRef(false);
 	const navigate = useNavigate();
 	const { gameType, player1, player2, difficulty } = useParams();
 
@@ -72,6 +74,7 @@ const Game = () => {
 	const [checkmate, setCheckmate] = useState(false);
 	const [stalemate, setStalemate] = useState(false);
 	const [winner, setWinner] = useState("");
+	const [loading, setLoading] = useState(false);
 
 	const numbers = defineNumbers(gameType);
 
@@ -98,7 +101,6 @@ const Game = () => {
 		// Keys: "ai_<color>", "two-players-<color>"
 
 		console.log("Entrando a saveGame -> Turn: ", turn);
-		console.log("Entrando a saveGame -> color: ", color);
 
 		const gameConfiguration = {
 			pieces: pieces,
@@ -142,10 +144,9 @@ const Game = () => {
 	};
 
 	useEffect(() => {
-		console.log("Cambio de turn en game: ", turn);
-	}, [turn]);
-
-	useEffect(() => {
+		if (executed.current) {
+			return;
+		}
 		const actualConfiguration = JSON.parse(localStorage.getItem(gameType));
 
 		if (
@@ -154,6 +155,7 @@ const Game = () => {
 			color === "black"
 		) {
 			// Empieza el juego la IA
+			executed.current = true;
 			generateAIMovement([], actualConfiguration.pieces);
 		}
 
@@ -171,6 +173,7 @@ const Game = () => {
 	}, []);
 
 	const generateAIMovement = async (newHistory, tempPieces) => {
+		setLoading(true);
 		let isValid = false;
 		let regenerate = false;
 		let lastGeneratedMovement;
@@ -380,9 +383,6 @@ const Game = () => {
 		var newTurn = color === "white" ? "light" : "dark";
 		setTurn(newTurn);
 
-		console.log("Color: ", color);
-		console.log("newTurn: ", newTurn);
-
 		const friendlyPieces = tempPieces.filter(
 			(p) => p.color === tempKing.color,
 		);
@@ -436,6 +436,13 @@ const Game = () => {
 			tempWinner,
 			newTurn,
 		);
+		setLoading(false);
+	};
+
+	const stylesObject = {
+		indicator: {
+			color: "#00d4ff",
+		},
 	};
 
 	return (
@@ -454,8 +461,11 @@ const Game = () => {
 								: "")
 					}
 				>
-					{player2}
-				</h2>
+					{player2}{" "}
+					{loading && (
+						<Spin size="medium" style={{ marginLeft: 10 }} />
+					)}
+				</h2>{" "}
 				<div className="captures">
 					{types.map((type) => {
 						const tempTypeList = capturesTop.filter((capture) => {
